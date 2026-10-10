@@ -1,0 +1,32 @@
+
+enum MachineType {
+  WASHER
+  DRYER
+}
+
+enum DormBuilding {
+  BUILDING_F
+  BUILDING_E
+  BUILDING_G
+}
+
+type UserAccount @table(key: "uid") {
+  uid: String! @default(expr: "auth.uid")
+  email: String!
+  dormBuilding: DormBuilding!
+}
+
+type LaundryActivity @table {
+  id: UUID!
+  machine: Machine! @ref
+  user: UserAccount!
+  isHeavyLoad: Boolean
+  createdAt: Timestamp! @default(expr: "request.time")
+  endsAt: Timestamp!
+}
+
+type Machine @table {
+  id: UUID! @default(expr: "uuidV4()")
+  type: MachineType!
+  dormBuilding: DormBuilding!
+}

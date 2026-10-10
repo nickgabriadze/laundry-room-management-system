@@ -1,3 +1,5 @@
+import { MachineList } from "@/src/dashboard/Machines";
+
 export default function Home() {
-  return <div>LMS</div>;
+  return <div><MachineList /></div>;
 }

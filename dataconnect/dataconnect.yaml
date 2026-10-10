@@ -1,0 +1,13 @@
+specVersion: "v1"
+serviceId: "lms-kiu-service"
+location: "europe-central2"
+schemas:
+  - source: "./schema"
+    datasource:
+      postgresql:
+        database: "lms-kiu-database"
+        cloudSql:
+          instanceId: "lms-kiu-instance"
+          # schemaValidation: "STRICT"     # STRICT mode makes Postgres schema match Data Connect exactly.
+          # schemaValidation: "COMPATIBLE" # COMPATIBLE mode makes Postgres schema compatible with Data Connect.
+connectorDirs: ["./lms"]
