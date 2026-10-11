@@ -11,7 +11,7 @@ export function MachineCard({
   machine: Machine;
   label: string;
 }) {
-  const isInUse = machine.activeSessions.length > 0;
+  const isInUse =true;
   const kind = machine.type === "WASHER" ? "Washer" : "Dryer";
 
   return (

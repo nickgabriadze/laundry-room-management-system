@@ -11,7 +11,6 @@
     inset -4px 0 7px rgb(55 94 115 / 8%);
 }
 
-
 .controlPanel {
   display: flex;
   height: 17px;
@@ -28,7 +27,6 @@
   border-radius: 2px;
   background: #dcebf0;
 }
-
 
 .controlKnob {
   width: 9px;
@@ -77,15 +75,17 @@
 }
 
 .waterWave {
-  width: 37px;
-  height: 14px;
-  border-top: 2px solid #a4e1ed;
+  display: block;
+  width: 43px;
+  height: 43px;
+  border: 2px solid transparent;
+  border-top-color: #c4f2f8;
+  border-right-color: #81d4e6;
   border-radius: 50%;
-  transform: rotate(-18deg);
 }
 
-.inUse .waterWave {
-  animation: wash 1.8s ease-in-out infinite alternate;
+.washer.inUse .waterWave {
+  animation: washSpin 1s linear infinite;
 }
 
 .dryerVents {
@@ -118,12 +118,9 @@
   background: #bdcbd2;
 }
 
-@keyframes wash {
-  from {
-    transform: translateX(-4px) rotate(-18deg);
-  }
+@keyframes washSpin {
   to {
-    transform: translateX(4px) rotate(18deg);
+    transform: rotate(360deg);
   }
 }
 
