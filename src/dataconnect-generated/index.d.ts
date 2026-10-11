@@ -35,6 +35,7 @@ export interface GetMyUserAccountData {
     uid: string;
     email: string;
     dormBuilding: DormBuilding;
+    buildingUpdatedAt?: TimestampString | null;
   } & UserAccount_Key;
 }
 
@@ -48,6 +49,9 @@ export interface ListMachinesByBuildingData {
     id: UUIDString;
     type: MachineType;
     dormBuilding: DormBuilding;
+    activeSessions: ({
+      id: UUIDString;
+    } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
 
@@ -66,6 +70,14 @@ export interface ListMachinesData {
 export interface Machine_Key {
   id: UUIDString;
   __typename?: 'Machine_Key';
+}
+
+export interface UpdateMyBuildingData {
+  userAccount_update?: UserAccount_Key | null;
+}
+
+export interface UpdateMyBuildingVariables {
+  dormBuilding: DormBuilding;
 }
 
 export interface UserAccount_Key {
@@ -120,4 +132,16 @@ export const createMyUserAccountRef: CreateMyUserAccountRef;
 
 export function createMyUserAccount(vars: CreateMyUserAccountVariables): MutationPromise<CreateMyUserAccountData, CreateMyUserAccountVariables>;
 export function createMyUserAccount(dc: DataConnect, vars: CreateMyUserAccountVariables): MutationPromise<CreateMyUserAccountData, CreateMyUserAccountVariables>;
+
+interface UpdateMyBuildingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateMyBuildingVariables): MutationRef<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateMyBuildingVariables): MutationRef<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+  operationName: string;
+}
+export const updateMyBuildingRef: UpdateMyBuildingRef;
+
+export function updateMyBuilding(vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+export function updateMyBuilding(dc: DataConnect, vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
 

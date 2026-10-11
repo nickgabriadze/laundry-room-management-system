@@ -15,6 +15,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMyUserAccount*](#getmyuseraccount)
 - [**Mutations**](#mutations)
   - [*CreateMyUserAccount*](#createmyuseraccount)
+  - [*UpdateMyBuilding*](#updatemybuilding)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `example`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -203,6 +204,9 @@ export interface ListMachinesByBuildingData {
     id: UUIDString;
     type: MachineType;
     dormBuilding: DormBuilding;
+    activeSessions: ({
+      id: UUIDString;
+    } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
 ```
@@ -310,6 +314,7 @@ export interface GetMyUserAccountData {
     uid: string;
     email: string;
     dormBuilding: DormBuilding;
+    buildingUpdatedAt?: TimestampString | null;
   } & UserAccount_Key;
 }
 ```
@@ -485,6 +490,115 @@ console.log(data.userAccount_insert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.userAccount_insert);
+});
+```
+
+## UpdateMyBuilding
+You can execute the `UpdateMyBuilding` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+updateMyBuilding(vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+
+interface UpdateMyBuildingRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateMyBuildingVariables): MutationRef<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+}
+export const updateMyBuildingRef: UpdateMyBuildingRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateMyBuilding(dc: DataConnect, vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+
+interface UpdateMyBuildingRef {
+  ...
+  (dc: DataConnect, vars: UpdateMyBuildingVariables): MutationRef<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+}
+export const updateMyBuildingRef: UpdateMyBuildingRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateMyBuildingRef:
+```typescript
+const name = updateMyBuildingRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateMyBuilding` mutation requires an argument of type `UpdateMyBuildingVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateMyBuildingVariables {
+  dormBuilding: DormBuilding;
+}
+```
+### Return Type
+Recall that executing the `UpdateMyBuilding` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateMyBuildingData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateMyBuildingData {
+  userAccount_update?: UserAccount_Key | null;
+}
+```
+### Using `UpdateMyBuilding`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateMyBuilding, UpdateMyBuildingVariables } from '@dataconnect/generated';
+
+// The `UpdateMyBuilding` mutation requires an argument of type `UpdateMyBuildingVariables`:
+const updateMyBuildingVars: UpdateMyBuildingVariables = {
+  dormBuilding: ..., 
+};
+
+// Call the `updateMyBuilding()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateMyBuilding(updateMyBuildingVars);
+// Variables can be defined inline as well.
+const { data } = await updateMyBuilding({ dormBuilding: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateMyBuilding(dataConnect, updateMyBuildingVars);
+
+console.log(data.userAccount_update);
+
+// Or, you can use the `Promise` API.
+updateMyBuilding(updateMyBuildingVars).then((response) => {
+  const data = response.data;
+  console.log(data.userAccount_update);
+});
+```
+
+### Using `UpdateMyBuilding`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateMyBuildingRef, UpdateMyBuildingVariables } from '@dataconnect/generated';
+
+// The `UpdateMyBuilding` mutation requires an argument of type `UpdateMyBuildingVariables`:
+const updateMyBuildingVars: UpdateMyBuildingVariables = {
+  dormBuilding: ..., 
+};
+
+// Call the `updateMyBuildingRef()` function to get a reference to the mutation.
+const ref = updateMyBuildingRef(updateMyBuildingVars);
+// Variables can be defined inline as well.
+const ref = updateMyBuildingRef({ dormBuilding: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateMyBuildingRef(dataConnect, updateMyBuildingVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.userAccount_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.userAccount_update);
 });
 ```
 

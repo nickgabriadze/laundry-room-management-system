@@ -19,6 +19,9 @@ query ListMachinesByBuilding($dormBuilding: DormBuilding!)
     id
     type
     dormBuilding
+    activeSessions: laundryActivities_on_machine(limit: 1) {
+      id
+    }
   }
 }
 
@@ -27,14 +30,40 @@ query GetMyUserAccount @auth(level: USER) {
     uid
     email
     dormBuilding
+    buildingUpdatedAt
   }
 }
 
-mutation CreateMyUserAccount($dormBuilding: DormBuilding!)
-  @auth(level: USER) {
-  userAccount_insert(data: {
-    uid_expr: "auth.uid"
-    email_expr: "auth.token.email"
-    dormBuilding: $dormBuilding
-  })
+mutation CreateMyUserAccount($dormBuilding: DormBuilding!) @auth(level: USER) {
+  userAccount_insert(
+    data: {
+      uid_expr: "auth.uid"
+      email_expr: "auth.token.email"
+      dormBuilding: $dormBuilding
+    }
+  )
+}
+
+mutation UpdateMyBuilding($dormBuilding: DormBuilding!) @auth(level: USER) {
+  userAccount_update(
+    first: {
+      where: {
+        _and: [
+          { uid: { eq_expr: "auth.uid" } }
+          {
+            _or: [
+              { buildingUpdatedAt: { isNull: true } }
+              {
+                buildingUpdatedAt: { lt_time: { now: true, sub: { days: 30 } } }
+              }
+            ]
+          }
+        ]
+      }
+    }
+    data: {
+      dormBuilding: $dormBuilding
+      buildingUpdatedAt_expr: "request.time"
+    }
+  )
 }

@@ -37,3 +37,16 @@
   font-size: 22px;
   padding: 10px;
 }
+.microsoftButtonLabel {
+  font-size: 18px;
+}
+.microsoftButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-size: 14px;
+}

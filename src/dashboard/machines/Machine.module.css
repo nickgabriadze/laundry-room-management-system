@@ -1,0 +1,101 @@
+.machineCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dbe5ec;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(23 54 74 / 5%);
+}
+
+.cardTopline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 15px 0;
+}
+
+.machineId {
+  color: #718494;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status i {
+  display: inline-block;
+  width: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.available .status {
+  color: #16764f;
+}
+
+.available .status i {
+  background: #22a36f;
+  box-shadow: 0 0 0 3px #e3f5ec;
+}
+
+.inUse .status {
+  color: #a45a0c;
+}
+
+.inUse .status i {
+  background: #e7942d;
+  box-shadow: 0 0 0 3px #fff0dc;
+}
+
+.applianceArea {
+  display: grid;
+  min-height: 174px;
+  place-items: center;
+  margin: 12px 12px 0;
+  border-radius: 5px;
+  background: #eef6fa;
+}
+
+.inUse .applianceArea {
+  background: #fff5e8;
+}
+
+.cardFooter {
+  padding: 14px 16px 17px;
+}
+
+.cardFooter h2 {
+  margin: 0;
+  color: #203c50;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.cardFooter span {
+  display: block;
+  margin-top: 4px;
+  color: #728594;
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .cardTopline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px 11px 0;
+  }
+
+  .applianceArea {
+    min-height: 148px;
+    margin-inline: 8px;
+  }
+}

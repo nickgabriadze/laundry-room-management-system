@@ -1,4 +1,4 @@
-import { ListMachinesData, ListMachinesByBuildingData, ListMachinesByBuildingVariables, GetMyUserAccountData, CreateMyUserAccountData, CreateMyUserAccountVariables } from '../';
+import { ListMachinesData, ListMachinesByBuildingData, ListMachinesByBuildingVariables, GetMyUserAccountData, CreateMyUserAccountData, CreateMyUserAccountVariables, UpdateMyBuildingData, UpdateMyBuildingVariables } from '../';
 import { UseDataConnectQueryResult, useDataConnectQueryOptions, UseDataConnectMutationResult, useDataConnectMutationOptions} from '@tanstack-query-firebase/react/data-connect';
 import { UseQueryResult, UseMutationResult} from '@tanstack/react-query';
 import { DataConnect } from 'firebase/data-connect';
@@ -16,3 +16,6 @@ export function useGetMyUserAccount(dc: DataConnect, options?: useDataConnectQue
 
 export function useCreateMyUserAccount(options?: useDataConnectMutationOptions<CreateMyUserAccountData, FirebaseError, CreateMyUserAccountVariables>): UseDataConnectMutationResult<CreateMyUserAccountData, CreateMyUserAccountVariables>;
 export function useCreateMyUserAccount(dc: DataConnect, options?: useDataConnectMutationOptions<CreateMyUserAccountData, FirebaseError, CreateMyUserAccountVariables>): UseDataConnectMutationResult<CreateMyUserAccountData, CreateMyUserAccountVariables>;
+
+export function useUpdateMyBuilding(options?: useDataConnectMutationOptions<UpdateMyBuildingData, FirebaseError, UpdateMyBuildingVariables>): UseDataConnectMutationResult<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+export function useUpdateMyBuilding(dc: DataConnect, options?: useDataConnectMutationOptions<UpdateMyBuildingData, FirebaseError, UpdateMyBuildingVariables>): UseDataConnectMutationResult<UpdateMyBuildingData, UpdateMyBuildingVariables>;

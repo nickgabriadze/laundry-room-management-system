@@ -72,3 +72,15 @@ export function createMyUserAccount(dcOrVars, vars) {
   return executeMutation(createMyUserAccountRef(dcInstance, inputVars));
 }
 
+export const updateMyBuildingRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateMyBuilding', inputVars);
+}
+updateMyBuildingRef.operationName = 'UpdateMyBuilding';
+
+export function updateMyBuilding(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateMyBuildingRef(dcInstance, inputVars));
+}
+

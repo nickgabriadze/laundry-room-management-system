@@ -1,4 +1,4 @@
-const { listMachinesRef, listMachinesByBuildingRef, getMyUserAccountRef, createMyUserAccountRef, connectorConfig } = require('../index.cjs.js');
+const { listMachinesRef, listMachinesByBuildingRef, getMyUserAccountRef, createMyUserAccountRef, updateMyBuildingRef, connectorConfig } = require('../index.cjs.js');
 const { validateArgs, CallerSdkTypeEnum } = require('firebase/data-connect');
 const { useDataConnectQuery, useDataConnectMutation, validateReactArgs } = require('@tanstack-query-firebase/react/data-connect');
 
@@ -24,6 +24,14 @@ exports.useCreateMyUserAccount = function useCreateMyUserAccount(dcOrOptions, op
   const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return createMyUserAccountRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useUpdateMyBuilding = function useUpdateMyBuilding(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return updateMyBuildingRef(dcInstance, vars);
   }
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
