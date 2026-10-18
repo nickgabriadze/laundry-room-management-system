@@ -17,6 +17,7 @@ type ReminderResponse = {
     | "scheduled"
     | "not-needed"
     | "cancelled"
+    | "queued"
     | "already-sent"
     | "not-scheduled";
   remindersCancelled?: boolean;

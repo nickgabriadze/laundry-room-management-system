@@ -246,13 +246,18 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setMyActiveSession(null);
       setActiveSessionEmail("");
       setMessage(
-        cancellation.reminderStatus === "already-sent"
-          ? "The machine was stopped and is now available. The 10-minute reminder email had already been sent and can't be recalled."
-          : cancellation.remindersCancelled
-            ? "The machine was stopped and is now available."
-            : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
+        cancellation.reminderStatus === "queued"
+          ? "The machine was stopped and is now available, but Resend had already queued the reminder email, so it may still be delivered."
+          : cancellation.reminderStatus === "already-sent"
+            ? "The machine was stopped and is now available. The 10-minute reminder email had already been sent and can't be recalled."
+            : cancellation.remindersCancelled
+              ? "The machine was stopped and is now available."
+              : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
       );
-      setIsMessageError(!cancellation.remindersCancelled);
+      setIsMessageError(
+        !cancellation.remindersCancelled ||
+          cancellation.reminderStatus === "queued",
+      );
       setPageState("ready");
       return true;
     } catch {

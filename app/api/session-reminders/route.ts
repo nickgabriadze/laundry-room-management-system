@@ -162,15 +162,24 @@ export async function POST(request: Request) {
         return jsonError("This reminder does not belong to your machine.", 403);
       }
 
-      if (email.last_event !== "scheduled") {
-        const reminderStatus =
-          email.last_event === "canceled"
-            ? "cancelled"
-            : ["sent", "delivered", "opened", "clicked"].includes(
-                  email.last_event,
-                )
+      const getReminderStatus = (lastEvent: typeof email.last_event) =>
+        lastEvent === "canceled"
+          ? "cancelled"
+          : lastEvent === "queued"
+            ? "queued"
+            : ["sent", "delivered", "opened", "clicked"].includes(lastEvent)
               ? "already-sent"
               : "not-scheduled";
+
+      if (email.last_event === "queued") {
+        return Response.json({
+          remindersCancelled: false,
+          reminderStatus: "queued",
+        });
+      }
+
+      if (email.last_event !== "scheduled") {
+        const reminderStatus = getReminderStatus(email.last_event);
         return Response.json({
           remindersCancelled: true,
           reminderStatus,
@@ -179,6 +188,29 @@ export async function POST(request: Request) {
 
       const { error } = await resend.emails.cancel(reminderRequest.emailId);
       if (error) {
+        const { data: latestEmail, error: latestEmailError } =
+          await resend.emails.get(reminderRequest.emailId);
+        if (
+          !latestEmailError &&
+          latestEmail &&
+          latestEmail.to.some(
+            (recipient) =>
+              recipient.toLowerCase() === userEmail.toLowerCase(),
+          )
+        ) {
+          if (latestEmail.last_event === "queued") {
+            return Response.json({
+              remindersCancelled: false,
+              reminderStatus: "queued",
+            });
+          }
+          if (latestEmail.last_event !== "scheduled") {
+            return Response.json({
+              remindersCancelled: true,
+              reminderStatus: getReminderStatus(latestEmail.last_event),
+            });
+          }
+        }
         throw new Error(`Resend could not cancel the reminder: ${error.message}`);
       }
       return Response.json({
