@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/src/firebase";
+import { getFirebaseAuth } from "@/src/firebase";
 import { type BuildingSelection } from "@/src/user/buildings";
 import {
   createCurrentUserProfile,
@@ -17,17 +17,19 @@ type PageState = "checking" | "ready" | "saving" | "error";
 export function useOnboarding() {
   const router = useRouter();
   const [building, setBuilding] = useState<BuildingSelection>("");
+  const [userEmail, setUserEmail] = useState<string | undefined>();
   const [pageState, setPageState] = useState<PageState>("checking");
   const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       if (!user) {
         router.replace("/signin");
         return;
       }
+      setUserEmail(user.email?.toLowerCase());
 
       void (async () => {
         try {
@@ -55,7 +57,7 @@ export function useOnboarding() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!building || !auth.currentUser) return;
+    if (!building || !getFirebaseAuth().currentUser) return;
 
     setPageState("saving");
     setError("");
@@ -87,7 +89,7 @@ export function useOnboarding() {
     pageState,
     error,
     setError,
-    userEmail: auth.currentUser?.email?.toLowerCase(),
+    userEmail,
     submit,
   };
 }

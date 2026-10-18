@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { QueryFetchPolicy } from "firebase/data-connect";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { auth } from "@/src/firebase";
+import { getFirebaseAuth } from "@/src/firebase";
 import {
   MachineType,
   listMachinesByBuilding,
@@ -63,7 +63,7 @@ export function MachineList() {
   );
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       if (!user) {
         setIsLoading(true);
         router.replace("/signin");

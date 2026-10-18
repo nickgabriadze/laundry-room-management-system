@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { OAuthProvider, onAuthStateChanged, signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/src/firebase";
+import { getFirebaseAuth } from "@/src/firebase";
 import { getMyUserAccount } from "@/src/dataconnect-generated";
 import { getMachineRedirect } from "../machineRedirect";
 
@@ -16,7 +16,7 @@ export function useSignIn() {
   useEffect(() => {
     let active = true;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       if (!user) {
         setIsCheckingSession(false);
         return;
@@ -60,7 +60,7 @@ export function useSignIn() {
         tenant: process.env.NEXT_PUBLIC_KIU_ENTRA_TENANT_ID ?? "consumers",
       });
 
-      await signInWithPopup(auth, provider);
+      await signInWithPopup(getFirebaseAuth(), provider);
     } catch {
       setError("Sign-in failed. Please try again.");
       setIsSigningIn(false);

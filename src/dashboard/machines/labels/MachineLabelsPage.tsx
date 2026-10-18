@@ -5,7 +5,7 @@ import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { QueryFetchPolicy } from "firebase/data-connect";
 import { useRouter } from "next/navigation";
-import { auth } from "@/src/firebase";
+import { getFirebaseAuth } from "@/src/firebase";
 import { listMachinesByBuilding } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { createMachineLabels, type MachineLabel } from "../utils/machineLabels";
@@ -22,7 +22,7 @@ export function MachineLabelsPage() {
   useEffect(() => {
     let active = true;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       if (!user) {
         router.replace("/signin");
         return;

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/src/firebase";
+import { getFirebaseAuth } from "@/src/firebase";
 import { type BuildingSelection } from "@/src/user/buildings";
 import {
   getBuildingChangeAvailableAt,
@@ -31,7 +31,7 @@ export function useProfilePage() {
   useEffect(() => {
     let active = true;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(getFirebaseAuth(), (user) => {
       if (!user) {
         router.replace("/signin");
         return;
@@ -77,7 +77,7 @@ export function useProfilePage() {
     setLogoutError("");
 
     try {
-      await signOut(auth);
+      await signOut(getFirebaseAuth());
       router.replace("/signin");
     } catch {
       setLogoutError("We couldn't sign you out. Please try again.");
