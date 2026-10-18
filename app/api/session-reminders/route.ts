@@ -185,7 +185,7 @@ export async function POST(request: Request) {
     const { data, error } = await resend.emails.send(
       {
         from: emailFrom,
-        to: "nickgabriadze@gmail.com",
+        to: userEmail,
         subject: `Your ${machineType} cycle finishes in 10 minutes`,
         text: `Your ${machineLabel} cycle finishes in about 10 minutes. Please plan to collect your laundry.`,
         html: `<p>Your <strong>${safeMachineLabel}</strong> cycle finishes in about 10 minutes.</p><p>Please plan to collect your laundry.</p>`,
