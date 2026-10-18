@@ -102,6 +102,13 @@
   font-size: 12px;
 }
 
+.availabilityTime {
+  margin: 8px 0 0;
+  color: #8a4b0a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 @media (max-width: 560px) {
   .cardTopline {
     align-items: flex-start;

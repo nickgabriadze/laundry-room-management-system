@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ListMachinesByBuildingData } from "@/src/dataconnect-generated";
 import { ApplianceIcon } from "./ApplianceIcon";
+import { MachineAvailabilityTime } from "./MachineAvailabilityTime";
 import styles from "./MachineCard.module.css";
 
 export type Machine = ListMachinesByBuildingData["machines"][number];
@@ -14,6 +15,7 @@ export function MachineCard({
 }) {
   const isInUse = machine.activeSessions.length > 0;
   const kind = machine.type === "WASHER" ? "Washer" : "Dryer";
+  const activeSession = machine.activeSessions[0];
 
   return (
     <li
@@ -35,6 +37,9 @@ export function MachineCard({
         <div className={styles.cardFooter}>
           <h2>{kind}</h2>
           <span>{isInUse ? "View session" : "Select a duration"}</span>
+          {machine.type === "WASHER" && activeSession && (
+            <MachineAvailabilityTime endsAt={activeSession.endsAt} />
+          )}
         </div>
       </Link>
     </li>
