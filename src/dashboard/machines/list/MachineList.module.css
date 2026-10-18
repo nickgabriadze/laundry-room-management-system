@@ -237,7 +237,7 @@
   }
 
   .machineActions {
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 
   .heading h1 {
