@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "@/src/firebase";
 import { BUILDINGS, type BuildingSelection } from "@/src/user/buildings";
@@ -28,6 +28,9 @@ export default function ProfilePage() {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -38,6 +41,7 @@ export default function ProfilePage() {
         return;
       }
 
+      setIsAuthenticated(true);
       setGreetingName(
         user.displayName?.trim() || user.email?.split("@")[0] || "there",
       );
@@ -71,6 +75,19 @@ export default function ProfilePage() {
       unsubscribe();
     };
   }, [router]);
+
+  async function handleSignOut() {
+    setIsSigningOut(true);
+    setLogoutError("");
+
+    try {
+      await signOut(auth);
+      router.replace("/signin");
+    } catch {
+      setLogoutError("We couldn't sign you out. Please try again.");
+      setIsSigningOut(false);
+    }
+  }
 
   const changeAvailableAt = getBuildingChangeAvailableAt(buildingUpdatedAt);
   const isBuildingChangeLocked =
@@ -118,9 +135,24 @@ export default function ProfilePage() {
         <Link className={styles.backLink} href="/">
           Back to dashboard
         </Link>
+        {isAuthenticated && (
+          <button
+            className={styles.signOutButton}
+            disabled={isSigningOut}
+            onClick={() => void handleSignOut()}
+            type="button"
+          >
+            {isSigningOut ? "Signing out..." : "Sign out"}
+          </button>
+        )}
       </header>
 
       <section className={styles.profile} aria-labelledby="profile-title">
+        {logoutError && (
+          <p className={styles.error} role="alert">
+            {logoutError}
+          </p>
+        )}
         <div className={styles.heading}>
           <p className={styles.eyebrow}>Resident profile</p>
           <h1 id="profile-title">Hello, {greetingName}</h1>
