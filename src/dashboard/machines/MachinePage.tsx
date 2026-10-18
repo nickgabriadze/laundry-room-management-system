@@ -15,8 +15,10 @@ import type { GetMyActiveMachineSessionData } from "@/src/dataconnect-generated"
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { ApplianceIcon } from "./ApplianceIcon";
 import type { Machine } from "./Machine";
+import { getMachineCodeMap } from "./machineCodes";
 import {
   forceCancelMyMachineSessionById,
+  MAX_WASHER_SESSION_MINUTES,
   startMachineSession,
 } from "./sessions";
 import styles from "./MachinePage.module.css";
@@ -30,7 +32,7 @@ type PageState =
   | "not-found";
 type ActiveSession = GetMyActiveMachineSessionData["laundryActivities"][number];
 
-export function MachinePage({ machineId }: { machineId: string }) {
+export function MachinePage({ machineCode }: { machineCode: string }) {
   const router = useRouter();
   const [machine, setMachine] = useState<Machine | null>(null);
   const [myActiveSession, setMyActiveSession] = useState<ActiveSession | null>(
@@ -53,36 +55,46 @@ export function MachinePage({ machineId }: { machineId: string }) {
         const profile = await getCurrentUserProfile();
         if (!isActive()) return;
         if (!profile) {
-          router.replace("/onboarding");
+          router.replace(
+            `/onboarding?redirect=${encodeURIComponent(`/machine/${machineCode}`)}`,
+          );
           return;
         }
 
-        const [machinesResponse, sessionResponse] = await Promise.all([
-          listMachinesByBuilding(
-            { dormBuilding: profile.dormBuilding },
-            { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
-          ),
-          getMyActiveMachineSession(
-            { machineId },
-            { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
-          ),
-        ]);
+        const machinesResponse = await listMachinesByBuilding(
+          { dormBuilding: profile.dormBuilding },
+          { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+        );
         if (!isActive()) return;
 
+        const availableMachines = machinesResponse.data.machines;
+        const codesById = getMachineCodeMap(availableMachines);
         const foundMachine =
-          machinesResponse.data.machines.find(
-            (item) => item.id === machineId,
+          availableMachines.find(
+            (item) => codesById.get(item.id) === machineCode,
           ) ?? null;
+        if (!foundMachine) {
+          setMachine(null);
+          setPageState("not-found");
+          return;
+        }
+
+        const sessionResponse = await getMyActiveMachineSession(
+          { machineId: foundMachine.id },
+          { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+        );
+        if (!isActive()) return;
+
         setMachine(foundMachine);
         setMyActiveSession(sessionResponse.data.laundryActivities[0] ?? null);
-        setPageState(foundMachine ? "ready" : "not-found");
+        setPageState("ready");
       } catch {
         if (!isActive()) return;
         setMessage("We couldn't load this machine. Please try again.");
         setPageState("error");
       }
     },
-    [machineId, router],
+    [machineCode, router],
   );
 
   useEffect(() => {
@@ -90,7 +102,9 @@ export function MachinePage({ machineId }: { machineId: string }) {
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        router.replace("/signin");
+        router.replace(
+          `/signin?redirect=${encodeURIComponent(`/machine/${machineCode}`)}`,
+        );
         return;
       }
 
@@ -101,7 +115,7 @@ export function MachinePage({ machineId }: { machineId: string }) {
       active = false;
       unsubscribe();
     };
-  }, [loadMachine, router]);
+  }, [loadMachine, machineCode, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -113,13 +127,25 @@ export function MachinePage({ machineId }: { machineId: string }) {
       setIsMessageError(true);
       return;
     }
+    if (
+      machine.type === "WASHER" &&
+      durationMinutes > MAX_WASHER_SESSION_MINUTES
+    ) {
+      setMessage("Washer sessions can be up to 120 minutes.");
+      setIsMessageError(true);
+      return;
+    }
 
     setPageState("submitting");
     setMessage("");
     setIsMessageError(false);
 
     try {
-      const session = await startMachineSession(machine.id, durationMinutes);
+      const session = await startMachineSession(
+        machine.id,
+        durationMinutes,
+        machine.type,
+      );
       setMachine({
         ...machine,
         activeSessions: [
@@ -221,6 +247,7 @@ export function MachinePage({ machineId }: { machineId: string }) {
             pageState === "cancelling") && (
           <>
             <p className={styles.eyebrow}>Laundry room</p>
+            <p className={styles.machineCode}>{machineCode}</p>
             <h1 id="machine-title">{machineType}</h1>
             <div
               className={`${styles.applianceArea} ${isOccupied ? styles.applianceAreaOccupied : ""}`}
@@ -313,6 +340,11 @@ export function MachinePage({ machineId }: { machineId: string }) {
                   className={styles.durationInput}
                   id="duration"
                   min="1"
+                  max={
+                    machine.type === "WASHER"
+                      ? MAX_WASHER_SESSION_MINUTES
+                      : undefined
+                  }
                   onChange={(event) => {
                     setDuration(event.target.value);
                     setMessage("");
@@ -324,8 +356,12 @@ export function MachinePage({ machineId }: { machineId: string }) {
                   value={duration}
                 />
                 <p className={styles.hint}>
-                  Enter a whole number of minutes. The machine becomes
-                  available automatically when the session ends.
+                  Enter a whole number of minutes
+                  {machine.type === "WASHER"
+                    ? ` (maximum ${MAX_WASHER_SESSION_MINUTES})`
+                    : ""}
+                  . The machine becomes available automatically when the
+                  session ends.
                 </p>
                 <button
                   className={styles.primaryButton}

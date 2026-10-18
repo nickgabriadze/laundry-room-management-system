@@ -205,6 +205,7 @@ The `data` property is an object of type `ListMachinesByBuildingData`, which is 
 export interface ListMachinesByBuildingData {
   machines: ({
     id: UUIDString;
+    machineCode?: string | null;
     type: MachineType;
     dormBuilding: DormBuilding;
     activeSessions: ({
@@ -334,7 +335,7 @@ import { connectorConfig, getMyActiveMachineSession, GetMyActiveMachineSessionVa
 
 // The `GetMyActiveMachineSession` query requires an argument of type `GetMyActiveMachineSessionVariables`:
 const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
-  machineId: ...,
+  machineId: ..., 
 };
 
 // Call the `getMyActiveMachineSession()` function to execute the query.
@@ -364,7 +365,7 @@ import { connectorConfig, getMyActiveMachineSessionRef, GetMyActiveMachineSessio
 
 // The `GetMyActiveMachineSession` query requires an argument of type `GetMyActiveMachineSessionVariables`:
 const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
-  machineId: ...,
+  machineId: ..., 
 };
 
 // Call the `getMyActiveMachineSessionRef()` function to get a reference to the query.
@@ -774,8 +775,8 @@ import { connectorConfig, occupyMachine, OccupyMachineVariables } from '@datacon
 
 // The `OccupyMachine` mutation requires an argument of type `OccupyMachineVariables`:
 const occupyMachineVars: OccupyMachineVariables = {
-  machineId: ...,
-  endsAt: ...,
+  machineId: ..., 
+  endsAt: ..., 
 };
 
 // Call the `occupyMachine()` function to execute the mutation.
@@ -807,8 +808,8 @@ import { connectorConfig, occupyMachineRef, OccupyMachineVariables } from '@data
 
 // The `OccupyMachine` mutation requires an argument of type `OccupyMachineVariables`:
 const occupyMachineVars: OccupyMachineVariables = {
-  machineId: ...,
-  endsAt: ...,
+  machineId: ..., 
+  endsAt: ..., 
 };
 
 // Call the `occupyMachineRef()` function to get a reference to the mutation.
@@ -890,7 +891,7 @@ import { connectorConfig, forceCancelMyMachineSession, ForceCancelMyMachineSessi
 
 // The `ForceCancelMyMachineSession` mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
 const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
-  machineId: ...,
+  machineId: ..., 
 };
 
 // Call the `forceCancelMyMachineSession()` function to execute the mutation.
@@ -922,7 +923,7 @@ import { connectorConfig, forceCancelMyMachineSessionRef, ForceCancelMyMachineSe
 
 // The `ForceCancelMyMachineSession` mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
 const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
-  machineId: ...,
+  machineId: ..., 
 };
 
 // Call the `forceCancelMyMachineSessionRef()` function to get a reference to the mutation.
@@ -948,3 +949,4 @@ executeMutation(ref).then((response) => {
   console.log(data.machine_update);
 });
 ```
+

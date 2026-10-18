@@ -219,6 +219,7 @@ To access the data returned by a Query, use the `UseQueryResult.data` field. The
 export interface ListMachinesByBuildingData {
   machines: ({
     id: UUIDString;
+    machineCode?: string | null;
     type: MachineType;
     dormBuilding: DormBuilding;
     activeSessions: ({
@@ -326,7 +327,7 @@ import { useGetMyActiveMachineSession } from '@dataconnect/generated/react'
 export default function GetMyActiveMachineSessionComponent() {
   // The `useGetMyActiveMachineSession` Query hook requires an argument of type `GetMyActiveMachineSessionVariables`:
   const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
-    machineId: ...,
+    machineId: ..., 
   };
 
   // You don't have to do anything to "execute" the Query.
@@ -719,8 +720,8 @@ export default function OccupyMachineComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useOccupyMachine` Mutation requires an argument of type `OccupyMachineVariables`:
   const occupyMachineVars: OccupyMachineVariables = {
-    machineId: ...,
-    endsAt: ...,
+    machineId: ..., 
+    endsAt: ..., 
   };
   mutation.mutate(occupyMachineVars);
   // Variables can be defined inline as well.
@@ -816,7 +817,7 @@ export default function ForceCancelMyMachineSessionComponent() {
   // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
   // The `useForceCancelMyMachineSession` Mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
   const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
-    machineId: ...,
+    machineId: ..., 
   };
   mutation.mutate(forceCancelMyMachineSessionVars);
   // Variables can be defined inline as well.
@@ -845,3 +846,4 @@ export default function ForceCancelMyMachineSessionComponent() {
   return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
 }
 ```
+

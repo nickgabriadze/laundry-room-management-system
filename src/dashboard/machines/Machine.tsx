@@ -7,10 +7,10 @@ export type Machine = ListMachinesByBuildingData["machines"][number];
 
 export function MachineCard({
   machine,
-  label,
+  machineCode,
 }: {
   machine: Machine;
-  label: string;
+  machineCode: string;
 }) {
   const isInUse = machine.activeSessions.length > 0;
   const kind = machine.type === "WASHER" ? "Washer" : "Dryer";
@@ -19,9 +19,9 @@ export function MachineCard({
     <li
       className={`${styles.machineCard} ${isInUse ? styles.inUse : styles.available}`}
     >
-      <Link className={styles.cardLink} href={`/machine/${machine.id}`}>
+      <Link className={styles.cardLink} href={`/machine/${machineCode}`}>
         <div className={styles.cardTopline}>
-          <span className={styles.machineId}>{label}</span>
+          <span className={styles.machineId}>{machineCode}</span>
           <span className={styles.status}>
             <i aria-hidden="true" />
             {isInUse ? "In use" : "Available"}

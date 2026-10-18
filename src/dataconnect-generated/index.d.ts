@@ -67,6 +67,7 @@ export interface LaundryActivity_Key {
 export interface ListMachinesByBuildingData {
   machines: ({
     id: UUIDString;
+    machineCode?: string | null;
     type: MachineType;
     dormBuilding: DormBuilding;
     activeSessions: ({

@@ -15,6 +15,15 @@ import styles from "./onboarding.module.css";
 
 type PageState = "checking" | "ready" | "saving" | "error";
 
+function getReturnRoute() {
+  const requestedRoute = new URLSearchParams(window.location.search).get(
+    "redirect",
+  );
+  return requestedRoute && /^\/machine\/[WD][EFG]\d+$/.test(requestedRoute)
+    ? requestedRoute
+    : "/";
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [building, setBuilding] = useState<BuildingSelection>("");
@@ -36,7 +45,7 @@ export default function OnboardingPage() {
           if (!active) return;
 
           if (account) {
-            router.replace("/");
+            router.replace(getReturnRoute());
             return;
           }
           setPageState("ready");
@@ -63,12 +72,12 @@ export default function OnboardingPage() {
 
     try {
       await createCurrentUserProfile(building);
-      router.replace("/");
+      router.replace(getReturnRoute());
     } catch {
       try {
         const account = await getCurrentUserProfile();
         if (account) {
-          router.replace("/");
+          router.replace(getReturnRoute());
           return;
         }
       } catch {

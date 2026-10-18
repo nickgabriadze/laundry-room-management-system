@@ -27,6 +27,7 @@ type LaundryActivity @table {
 
 type Machine @table {
   id: UUID! @default(expr: "uuidV4()")
+  machineCode: String @unique
   type: MachineType!
   dormBuilding: DormBuilding!
   occupiedUntil: Timestamp

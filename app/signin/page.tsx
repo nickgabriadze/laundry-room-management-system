@@ -30,7 +30,22 @@ export default function SignInPage() {
       void (async () => {
         try {
           const { data } = await getMyUserAccount();
-          if (active) router.replace(data.userAccount ? "/" : "/onboarding");
+          const requestedRoute = new URLSearchParams(
+            window.location.search,
+          ).get("redirect");
+          const returnRoute =
+            requestedRoute && /^\/machine\/[WD][EFG]\d+$/.test(requestedRoute)
+              ? requestedRoute
+              : null;
+          if (active) {
+            router.replace(
+              data.userAccount
+                ? (returnRoute ?? "/")
+                : returnRoute
+                  ? `/onboarding?redirect=${encodeURIComponent(returnRoute)}`
+                  : "/onboarding",
+            );
+          }
         } catch {
           if (!active) return;
           setError("We couldn't check your profile. Please try again.");

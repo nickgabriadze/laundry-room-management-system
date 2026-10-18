@@ -65,7 +65,7 @@ getMyActiveMachineSessionRef.operationName = 'GetMyActiveMachineSession';
 exports.getMyActiveMachineSessionRef = getMyActiveMachineSessionRef;
 
 exports.getMyActiveMachineSession = function getMyActiveMachineSession(dcOrVars, varsOrOptions, options) {
-
+  
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getMyActiveMachineSessionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }

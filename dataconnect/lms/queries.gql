@@ -17,6 +17,7 @@ query ListMachinesByBuilding($dormBuilding: DormBuilding!)
 ) {
   machines(where: { dormBuilding: { eq: $dormBuilding } }) {
     id
+    machineCode
     type
     dormBuilding
     activeSessions: laundryActivities_on_machine(
@@ -90,6 +91,14 @@ mutation OccupyMachine($machineId: UUID!, $endsAt: Timestamp!)
   @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.endsAt > request.time")
   @transaction {
   query @redact {
+    machine(key: { id: $machineId })
+      @check(expr: "this != null", message: "This machine is unavailable.")
+      @check(
+        expr: "this.type != 'WASHER' || vars.endsAt - request.time <= duration('7200s')"
+        message: "Washer sessions cannot exceed 120 minutes."
+      ) {
+      type
+    }
     userAccount(key: { uid_expr: "auth.uid" })
       @check(expr: "this != null", message: "Complete your profile first.") {
       dormBuilding

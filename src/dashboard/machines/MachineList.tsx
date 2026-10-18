@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { QueryFetchPolicy } from "firebase/data-connect";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { auth } from "@/src/firebase";
 import {
   MachineType,
@@ -11,8 +12,8 @@ import {
 } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { ApplianceIcon } from "./ApplianceIcon";
-import { DashboardHeader } from "./DashboardHeader";
 import { MachineCard, type Machine } from "./Machine";
+import { getMachineCodeMap } from "./machineCodes";
 import styles from "./MachineList.module.css";
 
 export function MachineList() {
@@ -22,7 +23,6 @@ export function MachineList() {
     MachineType.WASHER,
   );
   const [buildingName, setBuildingName] = useState("");
-  const [buildingCode, setBuildingCode] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -49,7 +49,6 @@ export function MachineList() {
         );
         setMachines(data.machines);
         setBuildingName(profile.dormBuilding.replace("BUILDING_", "Building "));
-        setBuildingCode(profile.dormBuilding.slice(-1));
       } catch {
         setError(
           "We couldn't load the machines. Check your connection and retry.",
@@ -82,8 +81,13 @@ export function MachineList() {
   const visibleMachines = machines.filter(
     (machine) => machine.type === selectedType,
   );
+  const machineCodes = getMachineCodeMap(machines);
   const orderedVisibleMachines = [...visibleMachines].sort((left, right) =>
-    left.id.localeCompare(right.id),
+    (machineCodes.get(left.id) ?? left.id).localeCompare(
+      machineCodes.get(right.id) ?? right.id,
+      undefined,
+      { numeric: true },
+    ),
   );
 
   if (isLoading) {
@@ -114,17 +118,22 @@ export function MachineList() {
                 Choose an available machine to get started.
               </p>
             </div>
-            <button
-              className={styles.refreshButton}
-              disabled={isLoading || isRefreshing}
-              onClick={() => void loadMachines(true)}
-              type="button"
-            >
-              <span aria-hidden="true" className={styles.refreshIcon}>
-                ↻
-              </span>
-              {isRefreshing ? "Refreshing" : "Refresh"}
-            </button>
+            <div className={styles.machineActions}>
+              <Link className={styles.refreshButton} href="/machine-labels">
+                Print QR stickers
+              </Link>
+              <button
+                className={styles.refreshButton}
+                disabled={isLoading || isRefreshing}
+                onClick={() => void loadMachines(true)}
+                type="button"
+              >
+                <span aria-hidden="true" className={styles.refreshIcon}>
+                  ↻
+                </span>
+                {isRefreshing ? "Refreshing" : "Refresh"}
+              </button>
+            </div>
           </header>
 
           {machines.length > 0 && (
@@ -187,10 +196,10 @@ export function MachineList() {
 
           {!isLoading && !error && visibleMachines.length > 0 && (
             <ul className={styles.machineGrid}>
-              {orderedVisibleMachines.map((machine, index) => (
+              {orderedVisibleMachines.map((machine) => (
                 <MachineCard
                   key={machine.id}
-                  label={`#${machine.type === MachineType.WASHER ? "W" : "D"}${buildingCode}${index + 1}`}
+                  machineCode={machineCodes.get(machine.id) ?? ""}
                   machine={machine}
                 />
               ))}

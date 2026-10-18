@@ -118,6 +118,20 @@
   font-weight: 650;
 }
 
+.machineActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.refreshButton {
+  text-decoration: none;
+}
+
+.refreshButton:hover {
+  background: #f5fafc;
+}
+
 .refreshButton:disabled {
   cursor: wait;
   opacity: 0.6;
@@ -220,6 +234,10 @@
 
   .heading {
     align-items: start;
+  }
+
+  .machineActions {
+    justify-content: flex-start;
   }
 
   .heading h1 {

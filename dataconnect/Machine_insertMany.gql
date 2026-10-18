@@ -4,28 +4,28 @@ mutation {
   machine_insertMany(
     data: [
       # for BUILDING_F
-      { dormBuilding: BUILDING_F, type: WASHER }
-      { dormBuilding: BUILDING_F, type: WASHER }
-      { dormBuilding: BUILDING_F, type: WASHER }
-      { dormBuilding: BUILDING_F, type: WASHER }
-      { dormBuilding: BUILDING_F, type: WASHER }
-      { dormBuilding: BUILDING_F, type: DRYER }
-      { dormBuilding: BUILDING_F, type: DRYER }
+      { machineCode: "WF1", dormBuilding: BUILDING_F, type: WASHER }
+      { machineCode: "WF2", dormBuilding: BUILDING_F, type: WASHER }
+      { machineCode: "WF3", dormBuilding: BUILDING_F, type: WASHER }
+      { machineCode: "WF4", dormBuilding: BUILDING_F, type: WASHER }
+      { machineCode: "WF5", dormBuilding: BUILDING_F, type: WASHER }
+      { machineCode: "DF1", dormBuilding: BUILDING_F, type: DRYER }
+      { machineCode: "DF2", dormBuilding: BUILDING_F, type: DRYER }
       # for BUILDING_E
-      { dormBuilding: BUILDING_E, type: WASHER }
-      { dormBuilding: BUILDING_E, type: WASHER }
-      { dormBuilding: BUILDING_E, type: WASHER }
-      { dormBuilding: BUILDING_E, type: WASHER }
-      { dormBuilding: BUILDING_E, type: WASHER }
-      { dormBuilding: BUILDING_E, type: DRYER }
-      { dormBuilding: BUILDING_E, type: DRYER }
+      { machineCode: "WE1", dormBuilding: BUILDING_E, type: WASHER }
+      { machineCode: "WE2", dormBuilding: BUILDING_E, type: WASHER }
+      { machineCode: "WE3", dormBuilding: BUILDING_E, type: WASHER }
+      { machineCode: "WE4", dormBuilding: BUILDING_E, type: WASHER }
+      { machineCode: "WE5", dormBuilding: BUILDING_E, type: WASHER }
+      { machineCode: "DE1", dormBuilding: BUILDING_E, type: DRYER }
+      { machineCode: "DE2", dormBuilding: BUILDING_E, type: DRYER }
       # for BUILDING_G
-      { dormBuilding: BUILDING_G, type: WASHER }
-      { dormBuilding: BUILDING_G, type: WASHER }
-      { dormBuilding: BUILDING_G, type: WASHER }
-      { dormBuilding: BUILDING_G, type: WASHER }
-      { dormBuilding: BUILDING_G, type: DRYER }
-      { dormBuilding: BUILDING_G, type: DRYER }
+      { machineCode: "WG1", dormBuilding: BUILDING_G, type: WASHER }
+      { machineCode: "WG2", dormBuilding: BUILDING_G, type: WASHER }
+      { machineCode: "WG3", dormBuilding: BUILDING_G, type: WASHER }
+      { machineCode: "WG4", dormBuilding: BUILDING_G, type: WASHER }
+      { machineCode: "DG1", dormBuilding: BUILDING_G, type: DRYER }
+      { machineCode: "DG2", dormBuilding: BUILDING_G, type: DRYER }
     ]
   )
 }

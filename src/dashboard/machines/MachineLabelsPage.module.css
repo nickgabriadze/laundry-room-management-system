@@ -1,0 +1,191 @@
+.page {
+  min-height: 100svh;
+  background: #f3f7fa;
+  color: #183044;
+}
+
+.toolbar {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 32px;
+  border-bottom: 1px solid #d6e4ef;
+  background: #fff;
+}
+
+.backLink {
+  color: #126fa8;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.printButton {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 5px;
+  background: #126fa8;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.printButton:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.content {
+  width: min(100% - 40px, 1040px);
+  margin: 36px auto 64px;
+}
+
+.content h1 {
+  margin: 0;
+  color: #203c50;
+  font-size: 28px;
+}
+
+.intro {
+  margin: 10px 0 24px;
+  color: #657b8c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.status,
+.error {
+  color: #526b7c;
+  font-size: 14px;
+}
+
+.error {
+  color: #b42318;
+}
+
+.labelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 16px;
+}
+
+.label {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  padding: 16px;
+  border: 1px solid #dbe5ec;
+  border-radius: 6px;
+  background: #fff;
+  text-align: center;
+  break-inside: avoid;
+}
+
+.qrCode {
+  width: 150px;
+  height: 150px;
+  image-rendering: pixelated;
+}
+
+.label h2 {
+  margin: 8px 0 0;
+  color: #183044;
+  font-size: 24px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+
+.label p {
+  margin: 4px 0 8px;
+  color: #526b7c;
+  font-size: 12px;
+}
+
+.url {
+  max-width: 100%;
+  color: #718494;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+
+.backLink:focus-visible,
+.printButton:focus-visible {
+  outline: 3px solid #1683c4;
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .toolbar {
+    padding-inline: 20px;
+  }
+
+  .content {
+    width: min(100% - 32px, 1040px);
+    margin-top: 28px;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .page {
+    min-height: 0;
+    background: #fff;
+    color: #000;
+  }
+
+  .toolbar,
+  .content > h1,
+  .intro,
+  .status,
+  .error {
+    display: none;
+  }
+
+  .content {
+    width: 100%;
+    margin: 0;
+  }
+
+  .labelGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6mm;
+  }
+
+  .label {
+    min-height: 58mm;
+    padding: 4mm;
+    border: 1px dashed #777;
+    border-radius: 0;
+    background: #fff;
+  }
+
+  .qrCode {
+    width: 34mm;
+    height: 34mm;
+  }
+
+  .label h2 {
+    font-size: 18pt;
+  }
+
+  .label p {
+    font-size: 9pt;
+  }
+
+  .url {
+    font-size: 6pt;
+  }
+}

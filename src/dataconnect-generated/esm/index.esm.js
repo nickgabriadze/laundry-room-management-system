@@ -55,7 +55,7 @@ export const getMyActiveMachineSessionRef = (dcOrVars, vars) => {
 getMyActiveMachineSessionRef.operationName = 'GetMyActiveMachineSession';
 
 export function getMyActiveMachineSession(dcOrVars, varsOrOptions, options) {
-
+  
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   return executeQuery(getMyActiveMachineSessionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
@@ -120,3 +120,4 @@ export function forceCancelMyMachineSession(dcOrVars, vars) {
   const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
   return executeMutation(forceCancelMyMachineSessionRef(dcInstance, inputVars));
 }
+
