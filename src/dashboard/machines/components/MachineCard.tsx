@@ -37,7 +37,7 @@ export function MachineCard({
         <div className={styles.cardFooter}>
           <h2>{kind}</h2>
           <span>{isInUse ? "View session" : "Select a duration"}</span>
-          {machine.type === "WASHER" && activeSession && (
+          {activeSession && (
             <MachineAvailabilityTime endsAt={activeSession.endsAt} />
           )}
         </div>

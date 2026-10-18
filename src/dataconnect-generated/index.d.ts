@@ -39,6 +39,18 @@ export interface ForceCancelMyMachineSessionVariables {
   machineId: UUIDString;
 }
 
+export interface GetMachineActiveSessionOwnerData {
+  laundryActivities: ({
+    user: {
+      email: string;
+    };
+  })[];
+}
+
+export interface GetMachineActiveSessionOwnerVariables {
+  machineId: UUIDString;
+}
+
 export interface GetMyActiveMachineSessionData {
   laundryActivities: ({
     id: UUIDString;
@@ -73,6 +85,9 @@ export interface ListMachinesByBuildingData {
     activeSessions: ({
       id: UUIDString;
       endsAt: TimestampString;
+      user: {
+        uid: string;
+      } & UserAccount_Key;
     } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
@@ -140,6 +155,18 @@ export const listMachinesByBuildingRef: ListMachinesByBuildingRef;
 
 export function listMachinesByBuilding(vars: ListMachinesByBuildingVariables, options?: ExecuteQueryOptions): QueryPromise<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
 export function listMachinesByBuilding(dc: DataConnect, vars: ListMachinesByBuildingVariables, options?: ExecuteQueryOptions): QueryPromise<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
+
+interface GetMachineActiveSessionOwnerRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMachineActiveSessionOwnerVariables): QueryRef<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables): QueryRef<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+  operationName: string;
+}
+export const getMachineActiveSessionOwnerRef: GetMachineActiveSessionOwnerRef;
+
+export function getMachineActiveSessionOwner(vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+export function getMachineActiveSessionOwner(dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
 
 interface GetMyActiveMachineSessionRef {
   /* Allow users to create refs without passing in DataConnect */

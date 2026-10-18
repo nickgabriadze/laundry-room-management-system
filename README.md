@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+The LRMS dashboard separates machines currently in use by the signed-in student
+from the full machine list. Occupied machine detail pages also show the active
+occupant's email address.
+
 ## Getting Started
 
 First, run the development server:

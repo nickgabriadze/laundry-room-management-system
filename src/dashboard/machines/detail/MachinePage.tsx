@@ -8,6 +8,7 @@ import { QueryFetchPolicy } from "firebase/data-connect";
 import { useRouter } from "next/navigation";
 import { getFirebaseAuth } from "@/src/firebase";
 import {
+  getMachineActiveSessionOwner,
   getMyActiveMachineSession,
   listMachinesByBuilding,
 } from "@/src/dataconnect-generated";
@@ -38,6 +39,10 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
   const [myActiveSession, setMyActiveSession] = useState<ActiveSession | null>(
     null,
   );
+  const [activeSessionEmail, setActiveSessionEmail] = useState("");
+  const [hasOtherMachineOfTypeInUse, setHasOtherMachineOfTypeInUse] =
+    useState(false);
+  const [showOtherMachineWarning, setShowOtherMachineWarning] = useState(false);
   const [duration, setDuration] = useState("");
   const [cancelConfirmationStep, setCancelConfirmationStep] = useState(0);
   const [pageState, setPageState] = useState<PageState>("loading");
@@ -50,6 +55,8 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setMessage("");
       setMachine(null);
       setMyActiveSession(null);
+      setActiveSessionEmail("");
+      setHasOtherMachineOfTypeInUse(false);
 
       try {
         const profile = await getCurrentUserProfile();
@@ -78,15 +85,37 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
           setPageState("not-found");
           return;
         }
+        const currentUserUid = getFirebaseAuth().currentUser?.uid;
+        setHasOtherMachineOfTypeInUse(
+          availableMachines.some(
+            (item) =>
+              item.id !== foundMachine.id &&
+              item.type === foundMachine.type &&
+              item.activeSessions.some(
+                (session) => session.user.uid === currentUserUid,
+              ),
+          ),
+        );
 
         const sessionResponse = await getMyActiveMachineSession(
           { machineId: foundMachine.id },
           { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
         );
         if (!isActive()) return;
+        const ownerResponse =
+          foundMachine.activeSessions.length > 0
+            ? await getMachineActiveSessionOwner(
+                { machineId: foundMachine.id },
+                { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+              )
+            : null;
+        if (!isActive()) return;
 
         setMachine(foundMachine);
         setMyActiveSession(sessionResponse.data.laundryActivities[0] ?? null);
+        setActiveSessionEmail(
+          ownerResponse?.data.laundryActivities[0]?.user.email ?? "",
+        );
         setPageState("ready");
       } catch {
         if (!isActive()) return;
@@ -121,6 +150,21 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
     event.preventDefault();
     if (!machine || machine.activeSessions.length > 0) return;
 
+    if (hasOtherMachineOfTypeInUse) {
+      setMessage("");
+      setShowOtherMachineWarning(true);
+      return;
+    }
+
+    setShowOtherMachineWarning(false);
+    const currentUser = getFirebaseAuth().currentUser;
+    if (!currentUser) {
+      router.replace(
+        `/signin?redirect=${encodeURIComponent(`/machine/${machineCode}`)}`,
+      );
+      return;
+    }
+
     const durationMinutes = Number(duration);
     if (!Number.isSafeInteger(durationMinutes) || durationMinutes < 1) {
       setMessage("Enter a whole number of minutes greater than zero.");
@@ -149,10 +193,17 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setMachine({
         ...machine,
         activeSessions: [
-          { id: session.activityId, endsAt: session.endsAt },
+          {
+            id: session.activityId,
+            endsAt: session.endsAt,
+            user: {
+              uid: currentUser.uid,
+            },
+          },
         ],
       });
       setMyActiveSession({ id: session.activityId, endsAt: session.endsAt });
+      setActiveSessionEmail(currentUser.email ?? "");
       setMessage(
         `Your session is active until ${new Date(session.endsAt).toLocaleString()}.`,
       );
@@ -160,7 +211,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setPageState("ready");
     } catch {
       setMessage(
-        "We couldn't occupy this machine. It may have been taken; refresh and try again.",
+        `We couldn't occupy this machine. It may have been taken, or you may already have another ${machine.type === "WASHER" ? "washer" : "dryer"} in use. Refresh and try again.`,
       );
       setIsMessageError(true);
       setPageState("ready");
@@ -187,6 +238,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
           : currentMachine,
       );
       setMyActiveSession(null);
+      setActiveSessionEmail("");
       setCancelConfirmationStep(0);
       setMessage("Your session was cancelled. The machine is now available.");
       setPageState("ready");
@@ -266,6 +318,14 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
                     </time>
                     .
                   </p>
+                  {activeSessionEmail && (
+                    <p>
+                      In use by{" "}
+                      <a href={`mailto:${activeSessionEmail}`}>
+                        {activeSessionEmail}
+                      </a>
+                    </p>
+                  )}
                 </div>
                 {myActiveSession && (
                   <div className={styles.cancelSection}>
@@ -281,6 +341,17 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
                       >
                         Force cancel my session
                       </button>
+                    ) : hasOtherMachineOfTypeInUse ? (
+                      <div className={styles.occupied} role="status">
+                        <h2>
+                          You already have a{" "}
+                          {machine.type === "WASHER" ? "washer" : "dryer"} in use
+                        </h2>
+                        <p>
+                          Finish or cancel your current session before using another{" "}
+                          {machine.type === "WASHER" ? "washer" : "dryer"}.
+                        </p>
+                      </div>
                     ) : (
                       <div
                         aria-labelledby="cancel-confirmation-title"
@@ -349,6 +420,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
                     setDuration(event.target.value);
                     setMessage("");
                     setIsMessageError(false);
+                    setShowOtherMachineWarning(false);
                   }}
                   required
                   step="1"
@@ -373,6 +445,19 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
                     : "Use this machine"}
                 </button>
               </form>
+            )}
+
+            {showOtherMachineWarning && (
+              <div className={styles.occupied} role="alert">
+                <h2>
+                  You already have a{" "}
+                  {machine.type === "WASHER" ? "washer" : "dryer"} in use
+                </h2>
+                <p>
+                  Finish or cancel your current session before using another{" "}
+                  {machine.type === "WASHER" ? "washer" : "dryer"}.
+                </p>
+              </div>
             )}
 
             {message && (

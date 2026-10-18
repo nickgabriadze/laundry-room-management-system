@@ -12,6 +12,7 @@ This README will guide you through the process of using the generated JavaScript
 - [**Queries**](#queries)
   - [*ListMachines*](#listmachines)
   - [*ListMachinesByBuilding*](#listmachinesbybuilding)
+  - [*GetMachineActiveSessionOwner*](#getmachineactivesessionowner)
   - [*GetMyActiveMachineSession*](#getmyactivemachinesession)
   - [*GetMyUserAccount*](#getmyuseraccount)
 - [**Mutations**](#mutations)
@@ -211,6 +212,9 @@ export interface ListMachinesByBuildingData {
     activeSessions: ({
       id: UUIDString;
       endsAt: TimestampString;
+      user: {
+        uid: string;
+      } & UserAccount_Key;
     } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
@@ -275,6 +279,119 @@ console.log(data.machines);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.machines);
+});
+```
+
+## GetMachineActiveSessionOwner
+You can execute the `GetMachineActiveSessionOwner` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+getMachineActiveSessionOwner(vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+
+interface GetMachineActiveSessionOwnerRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMachineActiveSessionOwnerVariables): QueryRef<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+}
+export const getMachineActiveSessionOwnerRef: GetMachineActiveSessionOwnerRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMachineActiveSessionOwner(dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+
+interface GetMachineActiveSessionOwnerRef {
+  ...
+  (dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables): QueryRef<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+}
+export const getMachineActiveSessionOwnerRef: GetMachineActiveSessionOwnerRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMachineActiveSessionOwnerRef:
+```typescript
+const name = getMachineActiveSessionOwnerRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMachineActiveSessionOwner` query requires an argument of type `GetMachineActiveSessionOwnerVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetMachineActiveSessionOwnerVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetMachineActiveSessionOwner` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMachineActiveSessionOwnerData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMachineActiveSessionOwnerData {
+  laundryActivities: ({
+    user: {
+      email: string;
+    };
+  })[];
+}
+```
+### Using `GetMachineActiveSessionOwner`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMachineActiveSessionOwner, GetMachineActiveSessionOwnerVariables } from '@dataconnect/generated';
+
+// The `GetMachineActiveSessionOwner` query requires an argument of type `GetMachineActiveSessionOwnerVariables`:
+const getMachineActiveSessionOwnerVars: GetMachineActiveSessionOwnerVariables = {
+  machineId: ..., 
+};
+
+// Call the `getMachineActiveSessionOwner()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMachineActiveSessionOwner(getMachineActiveSessionOwnerVars);
+// Variables can be defined inline as well.
+const { data } = await getMachineActiveSessionOwner({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMachineActiveSessionOwner(dataConnect, getMachineActiveSessionOwnerVars);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+getMachineActiveSessionOwner(getMachineActiveSessionOwnerVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
+});
+```
+
+### Using `GetMachineActiveSessionOwner`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMachineActiveSessionOwnerRef, GetMachineActiveSessionOwnerVariables } from '@dataconnect/generated';
+
+// The `GetMachineActiveSessionOwner` query requires an argument of type `GetMachineActiveSessionOwnerVariables`:
+const getMachineActiveSessionOwnerVars: GetMachineActiveSessionOwnerVariables = {
+  machineId: ..., 
+};
+
+// Call the `getMachineActiveSessionOwnerRef()` function to get a reference to the query.
+const ref = getMachineActiveSessionOwnerRef(getMachineActiveSessionOwnerVars);
+// Variables can be defined inline as well.
+const ref = getMachineActiveSessionOwnerRef({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMachineActiveSessionOwnerRef(dataConnect, getMachineActiveSessionOwnerVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
 });
 ```
 

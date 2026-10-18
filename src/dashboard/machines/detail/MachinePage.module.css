@@ -202,6 +202,7 @@
 
 .occupied {
   padding: 16px;
+  margin-top: 10px;
   border-left: 3px solid #e7942d;
   background: #fff5e8;
 }

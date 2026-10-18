@@ -26,6 +26,27 @@ query ListMachinesByBuilding($dormBuilding: DormBuilding!)
     ) {
       id
       endsAt
+      user {
+        uid
+      }
+    }
+  }
+}
+
+query GetMachineActiveSessionOwner($machineId: UUID!)
+@auth(
+  level: USER
+  insecureReason: "Signed-in students can see who is using a shared laundry machine."
+) {
+  laundryActivities(
+    where: {
+      machineId: { eq: $machineId }
+      endsAt: { gt_time: { now: true } }
+    }
+    limit: 1
+  ) {
+    user {
+      email
     }
   }
 }
@@ -105,11 +126,17 @@ mutation OccupyMachine($machineId: UUID!, $endsAt: Timestamp!)
     }
     laundryActivities(
       where: {
-        machineId: { eq: $machineId }
+        userUid: { eq_expr: "auth.uid" }
         endsAt: { gt_time: { now: true } }
       }
-    ) @check(expr: "this.size() == 0", message: "This machine is already in use.") {
-      id
+    )
+      @check(
+        expr: "this.exists(session, session.machine.type == response.query.machine.type) == false"
+        message: "You already have a machine of this type in use."
+      ) {
+      machine {
+        type
+      }
     }
   }
   machine_update(
@@ -140,6 +167,200 @@ mutation OccupyMachine($machineId: UUID!, $endsAt: Timestamp!)
 mutation ForceCancelMyMachineSession($machineId: UUID!)
   @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'")
   @transaction {
+  laundryActivity_update(
+    first: {
+      where: {
+        _and: [
+          { machineId: { eq: $machineId } }
+          { userUid: { eq_expr: "auth.uid" } }
+          { endsAt: { gt_time: { now: true } } }
+        ]
+      }
+    }
+    data: {
+      endsAt_expr: "request.time"
+      wasForceCancelled: true
+    }
+  ) @check(expr: "this != null", message: "You don't have an active session on this machine.")
+  machine_update(
+    first: {
+      where: {
+        id: { eq: $machineId }
+        occupiedUntil: { gt_time: { now: true } }
+      }
+    }
+    data: { occupiedUntil: null }
+  ) @check(expr: "this != null", message: "This machine is no longer occupied.")
+}
+
+mutation OccupyWasherMachine($machineId: UUID!, $endsAt: Timestamp!)
+  @retired
+  @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.endsAt > request.time")
+  @transaction {
+  query @redact {
+    machine(key: { id: $machineId })
+      @check(expr: "this != null", message: "This machine is unavailable.")
+      @check(expr: "this.type == 'WASHER'", message: "This operation is only for washers.")
+      @check(
+        expr: "vars.endsAt - request.time <= duration('7200s')"
+        message: "Washer sessions cannot exceed 120 minutes."
+      ) {
+      type
+    }
+    userAccount(key: { uid_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Complete your profile first.") {
+      dormBuilding
+    }
+    laundryActivities(
+      where: {
+        userUid: { eq_expr: "auth.uid" }
+        endsAt: { gt_time: { now: true } }
+      }
+    )
+      @check(
+        expr: "this.exists(session, session.machine.type == 'WASHER') == false"
+        message: "You already have a washer in use."
+      ) {
+      machineId
+      userUid
+      machine {
+        type
+      }
+    }
+  }
+  machine_update(
+    first: {
+      where: {
+        _and: [
+          { id: { eq: $machineId } }
+          { dormBuilding: { eq_expr: "response.query.userAccount.dormBuilding" } }
+          {
+            _or: [
+              { occupiedUntil: { isNull: true } }
+              { occupiedUntil: { lt_time: { now: true } } }
+            ]
+          }
+        ]
+      }
+    }
+    data: { occupiedUntil: $endsAt }
+  ) @check(expr: "this != null", message: "This machine is already in use.")
+  laundryActivity_insert(data: {
+    id_expr: "uuidV4()"
+    machineId: $machineId
+    userUid_expr: "auth.uid"
+    endsAt: $endsAt
+  })
+}
+
+mutation OccupyDryerMachine($machineId: UUID!, $endsAt: Timestamp!)
+  @retired
+  @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.endsAt > request.time")
+  @transaction {
+  query @redact {
+    machine(key: { id: $machineId })
+      @check(expr: "this != null", message: "This machine is unavailable.")
+      @check(expr: "this.type == 'DRYER'", message: "This operation is only for dryers.") {
+      type
+    }
+    userAccount(key: { uid_expr: "auth.uid" })
+      @check(expr: "this != null", message: "Complete your profile first.") {
+      dormBuilding
+    }
+    laundryActivities(
+      where: {
+        userUid: { eq_expr: "auth.uid" }
+        endsAt: { gt_time: { now: true } }
+      }
+    )
+      @check(
+        expr: "this.exists(session, session.machine.type == 'DRYER') == false"
+        message: "You already have a dryer in use."
+      ) {
+      machineId
+      userUid
+      machine {
+        type
+      }
+    }
+  }
+  machine_update(
+    first: {
+      where: {
+        _and: [
+          { id: { eq: $machineId } }
+          { dormBuilding: { eq_expr: "response.query.userAccount.dormBuilding" } }
+          {
+            _or: [
+              { occupiedUntil: { isNull: true } }
+              { occupiedUntil: { lt_time: { now: true } } }
+            ]
+          }
+        ]
+      }
+    }
+    data: { occupiedUntil: $endsAt }
+  ) @check(expr: "this != null", message: "This machine is already in use.")
+  laundryActivity_insert(data: {
+    id_expr: "uuidV4()"
+    machineId: $machineId
+    userUid_expr: "auth.uid"
+    endsAt: $endsAt
+  })
+}
+
+mutation ForceCancelMyWasherSession($machineId: UUID!)
+  @retired
+  @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'")
+  @transaction {
+  query @redact {
+    machine(key: { id: $machineId })
+      @check(
+        expr: "this != null && this.type == 'WASHER'"
+        message: "This is not an occupied washer."
+      ) {
+      type
+    }
+  }
+  laundryActivity_update(
+    first: {
+      where: {
+        _and: [
+          { machineId: { eq: $machineId } }
+          { userUid: { eq_expr: "auth.uid" } }
+          { endsAt: { gt_time: { now: true } } }
+        ]
+      }
+    }
+    data: {
+      endsAt_expr: "request.time"
+      wasForceCancelled: true
+    }
+  ) @check(expr: "this != null", message: "You don't have an active session on this machine.")
+  machine_update(
+    first: {
+      where: {
+        id: { eq: $machineId }
+        occupiedUntil: { gt_time: { now: true } }
+      }
+    }
+    data: { occupiedUntil: null }
+  ) @check(expr: "this != null", message: "This machine is no longer occupied.")
+}
+
+mutation ForceCancelMyDryerSession($machineId: UUID!)
+  @retired
+  @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous'")
+  @transaction {
+  query @redact {
+    machine(key: { id: $machineId })
+      @check(
+        expr: "this != null && this.type == 'DRYER'"
+        message: "This is not an occupied dryer."
+      ) {
+      type
+    }
+  }
   laundryActivity_update(
     first: {
       where: {
