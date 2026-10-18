@@ -162,11 +162,29 @@ export async function POST(request: Request) {
         return jsonError("This reminder does not belong to your machine.", 403);
       }
 
+      if (email.last_event !== "scheduled") {
+        const reminderStatus =
+          email.last_event === "canceled"
+            ? "cancelled"
+            : ["sent", "delivered", "opened", "clicked"].includes(
+                  email.last_event,
+                )
+              ? "already-sent"
+              : "not-scheduled";
+        return Response.json({
+          remindersCancelled: true,
+          reminderStatus,
+        });
+      }
+
       const { error } = await resend.emails.cancel(reminderRequest.emailId);
       if (error) {
         throw new Error(`Resend could not cancel the reminder: ${error.message}`);
       }
-      return Response.json({ remindersCancelled: true });
+      return Response.json({
+        remindersCancelled: true,
+        reminderStatus: "cancelled",
+      });
     }
 
     const endsAtMs = Date.parse(reminderRequest.endsAt);
@@ -180,15 +198,47 @@ export async function POST(request: Request) {
 
     const machineType =
       reminderRequest.machineType === "WASHER" ? "washer" : "dryer";
-    const machineLabel = reminderRequest.machineCode || `your ${machineType}`;
+    const machineLabel = `Your ${machineType}${
+      reminderRequest.machineCode
+        ? ` (${reminderRequest.machineCode})`
+        : ""
+    }`;
     const safeMachineLabel = escapeHtml(machineLabel);
+    const subject = `Laundry reminder: ${machineType} finishes in 10 minutes`;
+    const text = `${machineLabel} cycle is expected to finish in about 10 minutes.
+
+Please plan to collect your laundry promptly so the machine is available for the next person.
+
+This is an automated reminder based on the time entered when the cycle started. The actual finish time may vary.
+
+Laundry room`;
+    const html = `
+      <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+        Your ${machineType} cycle is expected to finish in about 10 minutes.
+      </div>
+      <div style="margin:0;padding:32px 16px;background-color:#f3f7fa;font-family:Arial,Helvetica,sans-serif;color:#183044;">
+        <div style="max-width:560px;margin:0 auto;padding:32px;background-color:#ffffff;border:1px solid #dbe5ec;border-radius:8px;">
+          <p style="margin:0 0 20px;color:#1678aa;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Laundry room reminder</p>
+          <h1 style="margin:0 0 16px;color:#203c50;font-size:24px;line-height:1.3;">Your laundry is almost ready</h1>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">
+            ${safeMachineLabel} cycle is expected to finish in <strong>about 10 minutes</strong>.
+          </p>
+          <p style="margin:0 0 24px;font-size:16px;line-height:1.6;">
+            Please plan to collect your laundry promptly so the machine is available for the next person.
+          </p>
+          <p style="margin:0;padding-top:16px;border-top:1px solid #e5edf2;color:#657b8c;font-size:13px;line-height:1.6;">
+            This is an automated reminder based on the time entered when the cycle started. The actual finish time may vary.
+          </p>
+        </div>
+      </div>
+    `;
     const { data, error } = await resend.emails.send(
       {
         from: emailFrom,
         to: userEmail,
-        subject: `Your ${machineType} cycle finishes in 10 minutes`,
-        text: `Your ${machineLabel} cycle finishes in about 10 minutes. Please plan to collect your laundry.`,
-        html: `<p>Your <strong>${safeMachineLabel}</strong> cycle finishes in about 10 minutes.</p><p>Please plan to collect your laundry.</p>`,
+        subject,
+        text,
+        html,
         scheduledAt: new Date(reminderAt).toISOString(),
         tags: [
           { name: "laundry_activity_id", value: reminderRequest.activityId },

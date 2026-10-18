@@ -13,7 +13,12 @@ export const MIN_SESSION_MINUTES = 10;
 export const MAX_WASHER_SESSION_MINUTES = 120;
 
 type ReminderResponse = {
-  reminderStatus?: "scheduled" | "not-needed";
+  reminderStatus?:
+    | "scheduled"
+    | "not-needed"
+    | "cancelled"
+    | "already-sent"
+    | "not-scheduled";
   remindersCancelled?: boolean;
   emailId?: string;
   error?: string;
@@ -129,7 +134,8 @@ export async function startMachineSession(
       scheduledReminderEmailId = response.emailId;
       reminderStatus = "scheduled";
     } else {
-      reminderStatus = response.reminderStatus ?? "failed";
+      reminderStatus =
+        response.reminderStatus === "not-needed" ? "not-needed" : "failed";
     }
   } catch (error) {
     console.error("Could not schedule laundry session reminder emails.", error);
@@ -151,6 +157,7 @@ export async function forceCancelMyMachineSessionById(
 ) {
   let emailId = scheduledReminderEmailId;
   let emailIdLookupFailed = false;
+  let reminderStatus: ReminderResponse["reminderStatus"] = "not-needed";
   try {
     if (!emailId) {
       const { data: activeSessionData } = await getMyActiveMachineSession(
@@ -174,15 +181,17 @@ export async function forceCancelMyMachineSessionById(
         emailId,
       });
       remindersCancelled = response.remindersCancelled ?? false;
+      reminderStatus = response.reminderStatus ?? "not-scheduled";
       if (remindersCancelled) {
         await saveSessionReminderEmailId({ activityId, emailId: null });
       }
     } catch (error) {
       console.error("Could not cancel laundry session reminder emails.", error);
       remindersCancelled = false;
+      reminderStatus = undefined;
     }
   }
 
   await forceCancelMyMachineSession({ machineId });
-  return { remindersCancelled };
+  return { remindersCancelled, reminderStatus };
 }
