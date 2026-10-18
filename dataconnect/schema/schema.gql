@@ -23,6 +23,7 @@ type LaundryActivity @table {
   createdAt: Timestamp! @default(expr: "request.time")
   endsAt: Timestamp!
   wasForceCancelled: Boolean! @default(value: false)
+  scheduledReminderEmailId: String
 }
 
 type Machine @table {

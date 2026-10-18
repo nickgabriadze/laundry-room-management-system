@@ -134,3 +134,28 @@ export function forceCancelMyMachineSession(dcOrVars, vars) {
   return executeMutation(forceCancelMyMachineSessionRef(dcInstance, inputVars));
 }
 
+export const getSessionForReminderSchedulingRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetSessionForReminderScheduling', inputVars);
+}
+getSessionForReminderSchedulingRef.operationName = 'GetSessionForReminderScheduling';
+
+export function getSessionForReminderScheduling(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getSessionForReminderSchedulingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+
+export const saveSessionReminderEmailIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'SaveSessionReminderEmailId', inputVars);
+}
+saveSessionReminderEmailIdRef.operationName = 'SaveSessionReminderEmailId';
+
+export function saveSessionReminderEmailId(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(saveSessionReminderEmailIdRef(dcInstance, inputVars));
+}
+

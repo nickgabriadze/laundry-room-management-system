@@ -15,11 +15,13 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMachineActiveSessionOwner*](#getmachineactivesessionowner)
   - [*GetMyActiveMachineSession*](#getmyactivemachinesession)
   - [*GetMyUserAccount*](#getmyuseraccount)
+  - [*GetSessionForReminderScheduling*](#getsessionforreminderscheduling)
 - [**Mutations**](#mutations)
   - [*CreateMyUserAccount*](#createmyuseraccount)
   - [*UpdateMyBuilding*](#updatemybuilding)
   - [*OccupyMachine*](#occupymachine)
   - [*ForceCancelMyMachineSession*](#forcecancelmymachinesession)
+  - [*SaveSessionReminderEmailId*](#savesessionreminderemailid)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `example`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -441,6 +443,7 @@ export interface GetMyActiveMachineSessionData {
   laundryActivities: ({
     id: UUIDString;
     endsAt: TimestampString;
+    scheduledReminderEmailId?: string | null;
   } & LaundryActivity_Key)[];
 }
 ```
@@ -600,6 +603,129 @@ console.log(data.userAccount);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.userAccount);
+});
+```
+
+## GetSessionForReminderScheduling
+You can execute the `GetSessionForReminderScheduling` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+getSessionForReminderScheduling(vars: GetSessionForReminderSchedulingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+
+interface GetSessionForReminderSchedulingRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSessionForReminderSchedulingVariables): QueryRef<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+}
+export const getSessionForReminderSchedulingRef: GetSessionForReminderSchedulingRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getSessionForReminderScheduling(dc: DataConnect, vars: GetSessionForReminderSchedulingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+
+interface GetSessionForReminderSchedulingRef {
+  ...
+  (dc: DataConnect, vars: GetSessionForReminderSchedulingVariables): QueryRef<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+}
+export const getSessionForReminderSchedulingRef: GetSessionForReminderSchedulingRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getSessionForReminderSchedulingRef:
+```typescript
+const name = getSessionForReminderSchedulingRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetSessionForReminderScheduling` query requires an argument of type `GetSessionForReminderSchedulingVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetSessionForReminderSchedulingVariables {
+  activityId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetSessionForReminderScheduling` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetSessionForReminderSchedulingData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetSessionForReminderSchedulingData {
+  laundryActivity?: {
+    id: UUIDString;
+    endsAt: TimestampString;
+    wasForceCancelled: boolean;
+    scheduledReminderEmailId?: string | null;
+    machine: {
+      id: UUIDString;
+      machineCode?: string | null;
+      type: MachineType;
+    } & Machine_Key;
+    user: {
+      uid: string;
+      email: string;
+    } & UserAccount_Key;
+  } & LaundryActivity_Key;
+}
+```
+### Using `GetSessionForReminderScheduling`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getSessionForReminderScheduling, GetSessionForReminderSchedulingVariables } from '@dataconnect/generated';
+
+// The `GetSessionForReminderScheduling` query requires an argument of type `GetSessionForReminderSchedulingVariables`:
+const getSessionForReminderSchedulingVars: GetSessionForReminderSchedulingVariables = {
+  activityId: ..., 
+};
+
+// Call the `getSessionForReminderScheduling()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getSessionForReminderScheduling(getSessionForReminderSchedulingVars);
+// Variables can be defined inline as well.
+const { data } = await getSessionForReminderScheduling({ activityId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getSessionForReminderScheduling(dataConnect, getSessionForReminderSchedulingVars);
+
+console.log(data.laundryActivity);
+
+// Or, you can use the `Promise` API.
+getSessionForReminderScheduling(getSessionForReminderSchedulingVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity);
+});
+```
+
+### Using `GetSessionForReminderScheduling`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getSessionForReminderSchedulingRef, GetSessionForReminderSchedulingVariables } from '@dataconnect/generated';
+
+// The `GetSessionForReminderScheduling` query requires an argument of type `GetSessionForReminderSchedulingVariables`:
+const getSessionForReminderSchedulingVars: GetSessionForReminderSchedulingVariables = {
+  activityId: ..., 
+};
+
+// Call the `getSessionForReminderSchedulingRef()` function to get a reference to the query.
+const ref = getSessionForReminderSchedulingRef(getSessionForReminderSchedulingVars);
+// Variables can be defined inline as well.
+const ref = getSessionForReminderSchedulingRef({ activityId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getSessionForReminderSchedulingRef(dataConnect, getSessionForReminderSchedulingVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.laundryActivity);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity);
 });
 ```
 
@@ -1064,6 +1190,118 @@ executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.laundryActivity_update);
   console.log(data.machine_update);
+});
+```
+
+## SaveSessionReminderEmailId
+You can execute the `SaveSessionReminderEmailId` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+saveSessionReminderEmailId(vars: SaveSessionReminderEmailIdVariables): MutationPromise<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+
+interface SaveSessionReminderEmailIdRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SaveSessionReminderEmailIdVariables): MutationRef<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+}
+export const saveSessionReminderEmailIdRef: SaveSessionReminderEmailIdRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+saveSessionReminderEmailId(dc: DataConnect, vars: SaveSessionReminderEmailIdVariables): MutationPromise<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+
+interface SaveSessionReminderEmailIdRef {
+  ...
+  (dc: DataConnect, vars: SaveSessionReminderEmailIdVariables): MutationRef<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+}
+export const saveSessionReminderEmailIdRef: SaveSessionReminderEmailIdRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the saveSessionReminderEmailIdRef:
+```typescript
+const name = saveSessionReminderEmailIdRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `SaveSessionReminderEmailId` mutation requires an argument of type `SaveSessionReminderEmailIdVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface SaveSessionReminderEmailIdVariables {
+  activityId: UUIDString;
+  emailId?: string | null;
+}
+```
+### Return Type
+Recall that executing the `SaveSessionReminderEmailId` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `SaveSessionReminderEmailIdData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface SaveSessionReminderEmailIdData {
+  laundryActivity_update?: LaundryActivity_Key | null;
+}
+```
+### Using `SaveSessionReminderEmailId`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, saveSessionReminderEmailId, SaveSessionReminderEmailIdVariables } from '@dataconnect/generated';
+
+// The `SaveSessionReminderEmailId` mutation requires an argument of type `SaveSessionReminderEmailIdVariables`:
+const saveSessionReminderEmailIdVars: SaveSessionReminderEmailIdVariables = {
+  activityId: ..., 
+  emailId: ..., // optional
+};
+
+// Call the `saveSessionReminderEmailId()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await saveSessionReminderEmailId(saveSessionReminderEmailIdVars);
+// Variables can be defined inline as well.
+const { data } = await saveSessionReminderEmailId({ activityId: ..., emailId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await saveSessionReminderEmailId(dataConnect, saveSessionReminderEmailIdVars);
+
+console.log(data.laundryActivity_update);
+
+// Or, you can use the `Promise` API.
+saveSessionReminderEmailId(saveSessionReminderEmailIdVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity_update);
+});
+```
+
+### Using `SaveSessionReminderEmailId`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, saveSessionReminderEmailIdRef, SaveSessionReminderEmailIdVariables } from '@dataconnect/generated';
+
+// The `SaveSessionReminderEmailId` mutation requires an argument of type `SaveSessionReminderEmailIdVariables`:
+const saveSessionReminderEmailIdVars: SaveSessionReminderEmailIdVariables = {
+  activityId: ..., 
+  emailId: ..., // optional
+};
+
+// Call the `saveSessionReminderEmailIdRef()` function to get a reference to the mutation.
+const ref = saveSessionReminderEmailIdRef(saveSessionReminderEmailIdVars);
+// Variables can be defined inline as well.
+const ref = saveSessionReminderEmailIdRef({ activityId: ..., emailId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = saveSessionReminderEmailIdRef(dataConnect, saveSessionReminderEmailIdVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.laundryActivity_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity_update);
 });
 ```
 

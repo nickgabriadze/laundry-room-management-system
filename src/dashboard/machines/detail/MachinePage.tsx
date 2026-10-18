@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { FormEvent } from "react";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { QueryFetchPolicy } from "firebase/data-connect";
@@ -16,13 +15,16 @@ import type { GetMyActiveMachineSessionData } from "@/src/dataconnect-generated"
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { ApplianceIcon } from "../components/ApplianceIcon";
 import type { Machine } from "../components/MachineCard";
-import { getMachineCodeMap } from "../utils/machineCodes";
 import {
   forceCancelMyMachineSessionById,
+  MIN_SESSION_MINUTES,
   MAX_WASHER_SESSION_MINUTES,
   startMachineSession,
 } from "../data/sessions";
+import { ActiveMachineSession } from "./ActiveMachineSession";
 import styles from "./MachinePage.module.css";
+import { MachineSessionForm } from "./MachineSessionForm";
+import { getMachineCodeMap } from "../utils/machineCodes";
 
 type PageState =
   | "loading"
@@ -42,9 +44,6 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
   const [activeSessionEmail, setActiveSessionEmail] = useState("");
   const [hasOtherMachineOfTypeInUse, setHasOtherMachineOfTypeInUse] =
     useState(false);
-  const [showOtherMachineWarning, setShowOtherMachineWarning] = useState(false);
-  const [duration, setDuration] = useState("");
-  const [cancelConfirmationStep, setCancelConfirmationStep] = useState(0);
   const [pageState, setPageState] = useState<PageState>("loading");
   const [message, setMessage] = useState("");
   const [isMessageError, setIsMessageError] = useState(false);
@@ -81,10 +80,10 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
             (item) => codesById.get(item.id) === machineCode,
           ) ?? null;
         if (!foundMachine) {
-          setMachine(null);
           setPageState("not-found");
           return;
         }
+
         const currentUserUid = getFirebaseAuth().currentUser?.uid;
         setHasOtherMachineOfTypeInUse(
           availableMachines.some(
@@ -102,6 +101,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
           { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
         );
         if (!isActive()) return;
+
         const ownerResponse =
           foundMachine.activeSessions.length > 0
             ? await getMachineActiveSessionOwner(
@@ -136,7 +136,6 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
         );
         return;
       }
-
       void loadMachine(() => active);
     });
 
@@ -146,17 +145,9 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
     };
   }, [loadMachine, machineCode, router]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function handleStartSession(duration: string) {
     if (!machine || machine.activeSessions.length > 0) return;
 
-    if (hasOtherMachineOfTypeInUse) {
-      setMessage("");
-      setShowOtherMachineWarning(true);
-      return;
-    }
-
-    setShowOtherMachineWarning(false);
     const currentUser = getFirebaseAuth().currentUser;
     if (!currentUser) {
       router.replace(
@@ -166,8 +157,11 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
     }
 
     const durationMinutes = Number(duration);
-    if (!Number.isSafeInteger(durationMinutes) || durationMinutes < 1) {
-      setMessage("Enter a whole number of minutes greater than zero.");
+    if (
+      !Number.isSafeInteger(durationMinutes) ||
+      durationMinutes < MIN_SESSION_MINUTES
+    ) {
+      setMessage(`Enter at least ${MIN_SESSION_MINUTES} whole minutes.`);
       setIsMessageError(true);
       return;
     }
@@ -175,7 +169,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       machine.type === "WASHER" &&
       durationMinutes > MAX_WASHER_SESSION_MINUTES
     ) {
-      setMessage("Washer sessions can be up to 120 minutes.");
+      setMessage("Washer cycles can be up to 120 minutes.");
       setIsMessageError(true);
       return;
     }
@@ -189,6 +183,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
         machine.id,
         durationMinutes,
         machine.type,
+        machineCode,
       );
       setMachine({
         ...machine,
@@ -196,22 +191,29 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
           {
             id: session.activityId,
             endsAt: session.endsAt,
-            user: {
-              uid: currentUser.uid,
-            },
+            user: { uid: currentUser.uid },
           },
         ],
       });
-      setMyActiveSession({ id: session.activityId, endsAt: session.endsAt });
+      setMyActiveSession({
+        id: session.activityId,
+        endsAt: session.endsAt,
+        scheduledReminderEmailId: session.scheduledReminderEmailId,
+      });
       setActiveSessionEmail(currentUser.email ?? "");
       setMessage(
-        `Your session is active until ${new Date(session.endsAt).toLocaleString()}.`,
+        session.reminderStatus === "failed"
+          ? `Your laundry machine is expected to finish at ${new Date(session.endsAt).toLocaleString()}, but we couldn't schedule the 10-minute reminder email.`
+          : session.reminderStatus === "scheduled"
+            ? `Your laundry machine is expected to finish at ${new Date(session.endsAt).toLocaleString()}. We'll email you 10 minutes before it finishes.`
+            : `Your laundry machine is expected to finish at ${new Date(session.endsAt).toLocaleString()}.`,
       );
-      setIsMessageError(false);
+      setIsMessageError(session.reminderStatus === "failed");
       setPageState("ready");
     } catch {
+      const machineType = machine.type === "WASHER" ? "washer" : "dryer";
       setMessage(
-        `We couldn't occupy this machine. It may have been taken, or you may already have another ${machine.type === "WASHER" ? "washer" : "dryer"} in use. Refresh and try again.`,
+        `We couldn't occupy this machine. It may have been taken, or you may already have another ${machineType} in use. Refresh and try again.`,
       );
       setIsMessageError(true);
       setPageState("ready");
@@ -219,14 +221,18 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
   }
 
   async function handleForceCancel() {
-    if (!machine || !myActiveSession) return;
+    if (!machine || !myActiveSession) return false;
 
     setPageState("cancelling");
     setMessage("");
     setIsMessageError(false);
 
     try {
-      await forceCancelMyMachineSessionById(machine.id);
+      const cancellation = await forceCancelMyMachineSessionById(
+        machine.id,
+        myActiveSession.id,
+        myActiveSession.scheduledReminderEmailId,
+      );
       setMachine((currentMachine) =>
         currentMachine
           ? {
@@ -239,24 +245,27 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       );
       setMyActiveSession(null);
       setActiveSessionEmail("");
-      setCancelConfirmationStep(0);
-      setMessage("Your session was cancelled. The machine is now available.");
+      setMessage(
+        cancellation.remindersCancelled
+          ? "The machine was stopped and is now available."
+          : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
+      );
+      setIsMessageError(!cancellation.remindersCancelled);
       setPageState("ready");
+      return true;
     } catch {
       setMessage(
-        "We couldn't cancel your session. It may have already ended; refresh and check the machine status.",
+        "We couldn't stop the machine. It may have already finished; refresh and check its status.",
       );
       setIsMessageError(true);
-      setCancelConfirmationStep(0);
       setPageState("ready");
+      return false;
     }
   }
 
-  const isOccupied = (machine?.activeSessions.length ?? 0) > 0;
-  const machineType =
-    machine?.type === "WASHER" ? "Washer" : "Dryer";
-  const activeSession = machine?.activeSessions[0];
   const isBusy = pageState === "submitting" || pageState === "cancelling";
+  const isOccupied = (machine?.activeSessions.length ?? 0) > 0;
+  const activeSession = machine?.activeSessions[0];
 
   return (
     <main className={styles.page}>
@@ -293,14 +302,13 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
           </div>
         )}
 
-        {machine &&
-          (pageState === "ready" ||
-            pageState === "submitting" ||
-            pageState === "cancelling") && (
+        {machine && pageState !== "loading" && pageState !== "error" && (
           <>
             <p className={styles.eyebrow}>Laundry room</p>
             <p className={styles.machineCode}>{machineCode}</p>
-            <h1 id="machine-title">{machineType}</h1>
+            <h1 id="machine-title">
+              {machine.type === "WASHER" ? "Washer" : "Dryer"}
+            </h1>
             <div
               className={`${styles.applianceArea} ${isOccupied ? styles.applianceAreaOccupied : ""}`}
             >
@@ -308,156 +316,30 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
             </div>
 
             {isOccupied && activeSession ? (
-              <>
-                <div className={styles.occupied} role="status">
-                  <h2>This machine is in use</h2>
-                  <p>
-                    It will become available{" "}
-                    <time dateTime={activeSession.endsAt}>
-                      {new Date(activeSession.endsAt).toLocaleString()}
-                    </time>
-                    .
-                  </p>
-                  {activeSessionEmail && (
-                    <p>
-                      In use by{" "}
-                      <a href={`mailto:${activeSessionEmail}`}>
-                        {activeSessionEmail}
-                      </a>
-                    </p>
-                  )}
-                </div>
-                {myActiveSession && (
-                  <div className={styles.cancelSection}>
-                    {cancelConfirmationStep === 0 ? (
-                      <button
-                        className={styles.forceCancelButton}
-                        disabled={isBusy}
-                        onClick={() => {
-                          setMessage("");
-                          setCancelConfirmationStep(1);
-                        }}
-                        type="button"
-                      >
-                        Force cancel my session
-                      </button>
-                    ) : hasOtherMachineOfTypeInUse ? (
-                      <div className={styles.occupied} role="status">
-                        <h2>
-                          You already have a{" "}
-                          {machine.type === "WASHER" ? "washer" : "dryer"} in use
-                        </h2>
-                        <p>
-                          Finish or cancel your current session before using another{" "}
-                          {machine.type === "WASHER" ? "washer" : "dryer"}.
-                        </p>
-                      </div>
-                    ) : (
-                      <div
-                        aria-labelledby="cancel-confirmation-title"
-                        className={styles.confirmation}
-                        role="group"
-                      >
-                        <h2 id="cancel-confirmation-title">
-                          {cancelConfirmationStep === 1
-                            ? "Are you sure you want to cancel?"
-                            : "Confirm force cancel"}
-                        </h2>
-                        <p>
-                          {cancelConfirmationStep === 1
-                            ? "Your session will end immediately, even if the machine has already started."
-                            : "This cannot be undone. The machine will be made available to other students immediately."}
-                        </p>
-                        <div className={styles.confirmationActions}>
-                          <button
-                            className={styles.secondaryButton}
-                            disabled={isBusy}
-                            onClick={() => setCancelConfirmationStep(0)}
-                            type="button"
-                          >
-                            Keep my session
-                          </button>
-                          <button
-                            className={styles.forceCancelButton}
-                            disabled={isBusy}
-                            onClick={() => {
-                              if (cancelConfirmationStep === 1) {
-                                setCancelConfirmationStep(2);
-                              } else {
-                                void handleForceCancel();
-                              }
-                            }}
-                            type="button"
-                          >
-                            {cancelConfirmationStep === 1
-                              ? "Continue"
-                              : pageState === "cancelling"
-                                ? "Cancelling..."
-                                : "Yes, force cancel"}
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
+              <ActiveMachineSession
+                activeSession={activeSession}
+                activeSessionEmail={activeSessionEmail}
+                busy={isBusy}
+                hasOtherMachineOfTypeInUse={hasOtherMachineOfTypeInUse}
+                machine={machine}
+                myActiveSession={myActiveSession}
+                onBeginCancel={() => {
+                  setMessage("");
+                  setIsMessageError(false);
+                }}
+                onForceCancel={handleForceCancel}
+              />
             ) : (
-              <form className={styles.form} onSubmit={handleSubmit}>
-                <label className={styles.durationLabel} htmlFor="duration">
-                  How many minutes would you like to use it?
-                </label>
-                <input
-                  autoComplete="off"
-                  className={styles.durationInput}
-                  id="duration"
-                  min="1"
-                  max={
-                    machine.type === "WASHER"
-                      ? MAX_WASHER_SESSION_MINUTES
-                      : undefined
-                  }
-                  onChange={(event) => {
-                    setDuration(event.target.value);
-                    setMessage("");
-                    setIsMessageError(false);
-                    setShowOtherMachineWarning(false);
-                  }}
-                  required
-                  step="1"
-                  type="number"
-                  value={duration}
-                />
-                <p className={styles.hint}>
-                  Enter a whole number of minutes
-                  {machine.type === "WASHER"
-                    ? ` (maximum ${MAX_WASHER_SESSION_MINUTES})`
-                    : ""}
-                  . The machine becomes available automatically when the
-                  session ends.
-                </p>
-                <button
-                  className={styles.primaryButton}
-                  disabled={isBusy || duration.length === 0}
-                  type="submit"
-                >
-                  {pageState === "submitting"
-                    ? "Starting session..."
-                    : "Use this machine"}
-                </button>
-              </form>
-            )}
-
-            {showOtherMachineWarning && (
-              <div className={styles.occupied} role="alert">
-                <h2>
-                  You already have a{" "}
-                  {machine.type === "WASHER" ? "washer" : "dryer"} in use
-                </h2>
-                <p>
-                  Finish or cancel your current session before using another{" "}
-                  {machine.type === "WASHER" ? "washer" : "dryer"}.
-                </p>
-              </div>
+              <MachineSessionForm
+                busy={isBusy}
+                hasOtherMachineOfTypeInUse={hasOtherMachineOfTypeInUse}
+                machine={machine}
+                onInputChange={() => {
+                  setMessage("");
+                  setIsMessageError(false);
+                }}
+                onStart={handleStartSession}
+              />
             )}
 
             {message && (

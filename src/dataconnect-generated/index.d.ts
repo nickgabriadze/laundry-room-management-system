@@ -55,6 +55,7 @@ export interface GetMyActiveMachineSessionData {
   laundryActivities: ({
     id: UUIDString;
     endsAt: TimestampString;
+    scheduledReminderEmailId?: string | null;
   } & LaundryActivity_Key)[];
 }
 
@@ -69,6 +70,28 @@ export interface GetMyUserAccountData {
     dormBuilding: DormBuilding;
     buildingUpdatedAt?: TimestampString | null;
   } & UserAccount_Key;
+}
+
+export interface GetSessionForReminderSchedulingData {
+  laundryActivity?: {
+    id: UUIDString;
+    endsAt: TimestampString;
+    wasForceCancelled: boolean;
+    scheduledReminderEmailId?: string | null;
+    machine: {
+      id: UUIDString;
+      machineCode?: string | null;
+      type: MachineType;
+    } & Machine_Key;
+    user: {
+      uid: string;
+      email: string;
+    } & UserAccount_Key;
+  } & LaundryActivity_Key;
+}
+
+export interface GetSessionForReminderSchedulingVariables {
+  activityId: UUIDString;
 }
 
 export interface LaundryActivity_Key {
@@ -117,6 +140,15 @@ export interface OccupyMachineData {
 export interface OccupyMachineVariables {
   machineId: UUIDString;
   endsAt: TimestampString;
+}
+
+export interface SaveSessionReminderEmailIdData {
+  laundryActivity_update?: LaundryActivity_Key | null;
+}
+
+export interface SaveSessionReminderEmailIdVariables {
+  activityId: UUIDString;
+  emailId?: string | null;
 }
 
 export interface UpdateMyBuildingData {
@@ -239,4 +271,28 @@ export const forceCancelMyMachineSessionRef: ForceCancelMyMachineSessionRef;
 
 export function forceCancelMyMachineSession(vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
 export function forceCancelMyMachineSession(dc: DataConnect, vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+
+interface GetSessionForReminderSchedulingRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetSessionForReminderSchedulingVariables): QueryRef<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetSessionForReminderSchedulingVariables): QueryRef<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+  operationName: string;
+}
+export const getSessionForReminderSchedulingRef: GetSessionForReminderSchedulingRef;
+
+export function getSessionForReminderScheduling(vars: GetSessionForReminderSchedulingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+export function getSessionForReminderScheduling(dc: DataConnect, vars: GetSessionForReminderSchedulingVariables, options?: ExecuteQueryOptions): QueryPromise<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+
+interface SaveSessionReminderEmailIdRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: SaveSessionReminderEmailIdVariables): MutationRef<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: SaveSessionReminderEmailIdVariables): MutationRef<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+  operationName: string;
+}
+export const saveSessionReminderEmailIdRef: SaveSessionReminderEmailIdRef;
+
+export function saveSessionReminderEmailId(vars: SaveSessionReminderEmailIdVariables): MutationPromise<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+export function saveSessionReminderEmailId(dc: DataConnect, vars: SaveSessionReminderEmailIdVariables): MutationPromise<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
 

@@ -62,6 +62,7 @@ query GetMyActiveMachineSession($machineId: UUID!) @auth(level: USER) {
   ) {
     id
     endsAt
+    scheduledReminderEmailId
   }
 }
 
@@ -325,4 +326,42 @@ mutation ForceCancelMyDryerSession($machineId: UUID!)
     }
     data: { occupiedUntil: null }
   ) @check(expr: "this != null", message: "This machine is no longer occupied.")
+}
+
+query GetSessionForReminderScheduling($activityId: UUID!)
+  @auth(level: NO_ACCESS) {
+  laundryActivity(key: { id: $activityId }) {
+    id
+    endsAt
+    wasForceCancelled
+    scheduledReminderEmailId
+    machine {
+      id
+      machineCode
+      type
+    }
+    user {
+      uid
+      email
+    }
+  }
+}
+
+mutation SaveSessionReminderEmailId($activityId: UUID!, $emailId: String)
+  @auth(level: USER)
+  @transaction {
+  laundryActivity_update(
+    first: {
+      where: {
+        _and: [
+          { id: { eq: $activityId } }
+          { userUid: { eq_expr: "auth.uid" } }
+        ]
+      }
+    }
+    data: { scheduledReminderEmailId: $emailId }
+  ) @check(
+    expr: "this != null"
+    message: "Could not save the reminder ID for this laundry activity."
+  )
 }
