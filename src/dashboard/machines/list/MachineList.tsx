@@ -20,6 +20,8 @@ import styles from "./MachineList.module.css";
 export function MachineList() {
   const router = useRouter();
   const [machines, setMachines] = useState<Machine[]>([]);
+  const [currentUserUid, setCurrentUserUid] = useState("");
+  const [selectedScope, setSelectedScope] = useState<"all" | "mine">("all");
   const [selectedType, setSelectedType] = useState<MachineType>(
     MachineType.WASHER,
   );
@@ -69,6 +71,7 @@ export function MachineList() {
         router.replace("/signin");
         return;
       }
+      setCurrentUserUid(user.uid);
       void loadMachines();
     });
 
@@ -79,7 +82,14 @@ export function MachineList() {
     (machine) => machine.type === MachineType.WASHER,
   ).length;
   const dryerCount = machines.length - washerCount;
-  const visibleMachines = machines.filter(
+  const myOccupiedMachines = machines.filter((machine) =>
+    machine.activeSessions.some(
+      (session) => session.user.uid === currentUserUid,
+    ),
+  );
+  const scopedMachines =
+    selectedScope === "mine" ? myOccupiedMachines : machines;
+  const visibleMachines = scopedMachines.filter(
     (machine) => machine.type === selectedType,
   );
   const machineCodes = getMachineCodeMap(machines);
@@ -132,28 +142,58 @@ export function MachineList() {
           </header>
 
           {machines.length > 0 && (
-            <div
-              className={styles.typeSwitch}
-              role="group"
-              aria-label="Filter by machine type"
-            >
-              <button
-                aria-pressed={selectedType === MachineType.WASHER}
-                className={`${styles.typeButton} ${selectedType === MachineType.WASHER ? styles.typeButtonActive : ""}`}
-                onClick={() => setSelectedType(MachineType.WASHER)}
-                type="button"
+            <>
+              <div
+                className={styles.scopeSwitch}
+                role="group"
+                aria-label="Filter by occupancy"
               >
-                Washers <span className={styles.typeCount}>{washerCount}</span>
-              </button>
-              <button
-                aria-pressed={selectedType === MachineType.DRYER}
-                className={`${styles.typeButton} ${selectedType === MachineType.DRYER ? styles.typeButtonActive : ""}`}
-                onClick={() => setSelectedType(MachineType.DRYER)}
-                type="button"
+                <button
+                  aria-pressed={selectedScope === "all"}
+                  className={`${styles.scopeButton} ${selectedScope === "all" ? styles.scopeButtonActive : ""}`}
+                  onClick={() => setSelectedScope("all")}
+                  type="button"
+                >
+                  All machines
+                  <span className={styles.typeCount}>{machines.length}</span>
+                </button>
+                <button
+                  aria-pressed={selectedScope === "mine"}
+                  className={`${styles.scopeButton} ${selectedScope === "mine" ? styles.scopeButtonActive : ""}`}
+                  onClick={() => setSelectedScope("mine")}
+                  type="button"
+                >
+                  In use by me
+                  <span className={styles.typeCount}>
+                    {myOccupiedMachines.length}
+                  </span>
+                </button>
+              </div>
+
+              <div
+                className={styles.typeSwitch}
+                role="group"
+                aria-label="Filter by machine type"
               >
-                Dryers <span className={styles.typeCount}>{dryerCount}</span>
-              </button>
-            </div>
+                <button
+                  aria-pressed={selectedType === MachineType.WASHER}
+                  className={`${styles.typeButton} ${selectedType === MachineType.WASHER ? styles.typeButtonActive : ""}`}
+                  onClick={() => setSelectedType(MachineType.WASHER)}
+                  type="button"
+                >
+                  Washers{" "}
+                  <span className={styles.typeCount}>{washerCount}</span>
+                </button>
+                <button
+                  aria-pressed={selectedType === MachineType.DRYER}
+                  className={`${styles.typeButton} ${selectedType === MachineType.DRYER ? styles.typeButtonActive : ""}`}
+                  onClick={() => setSelectedType(MachineType.DRYER)}
+                  type="button"
+                >
+                  Dryers <span className={styles.typeCount}>{dryerCount}</span>
+                </button>
+              </div>
+            </>
           )}
 
           {isLoading && (
@@ -182,10 +222,22 @@ export function MachineList() {
           {!isLoading &&
             !error &&
             machines.length > 0 &&
+            scopedMachines.length === 0 && (
+              <p className={styles.emptyState}>
+                You don’t have any machines in use right now.
+              </p>
+            )}
+
+          {!isLoading &&
+            !error &&
+            scopedMachines.length > 0 &&
             visibleMachines.length === 0 && (
               <p className={styles.emptyState}>
-                No {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
-                are listed for this building.
+                No{" "}
+                {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
+                {selectedScope === "mine"
+                  ? "of this type are in use by you."
+                  : "are listed for this building."}
               </p>
             )}
 

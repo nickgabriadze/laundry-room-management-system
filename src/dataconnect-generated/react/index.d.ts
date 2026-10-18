@@ -1,4 +1,4 @@
-import { ListMachinesData, ListMachinesByBuildingData, ListMachinesByBuildingVariables, GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables, GetMyUserAccountData, CreateMyUserAccountData, CreateMyUserAccountVariables, UpdateMyBuildingData, UpdateMyBuildingVariables, OccupyMachineData, OccupyMachineVariables, ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables } from '../';
+import { ListMachinesData, ListMachinesByBuildingData, ListMachinesByBuildingVariables, GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables, GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables, GetMyUserAccountData, CreateMyUserAccountData, CreateMyUserAccountVariables, UpdateMyBuildingData, UpdateMyBuildingVariables, OccupyMachineData, OccupyMachineVariables, ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables, GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables, SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables } from '../';
 import { UseDataConnectQueryResult, useDataConnectQueryOptions, UseDataConnectMutationResult, useDataConnectMutationOptions} from '@tanstack-query-firebase/react/data-connect';
 import { UseQueryResult, UseMutationResult} from '@tanstack/react-query';
 import { DataConnect } from 'firebase/data-connect';
@@ -10,6 +10,9 @@ export function useListMachines(dc: DataConnect, options?: useDataConnectQueryOp
 
 export function useListMachinesByBuilding(vars: ListMachinesByBuildingVariables, options?: useDataConnectQueryOptions<ListMachinesByBuildingData>): UseDataConnectQueryResult<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
 export function useListMachinesByBuilding(dc: DataConnect, vars: ListMachinesByBuildingVariables, options?: useDataConnectQueryOptions<ListMachinesByBuildingData>): UseDataConnectQueryResult<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
+
+export function useGetMachineActiveSessionOwner(vars: GetMachineActiveSessionOwnerVariables, options?: useDataConnectQueryOptions<GetMachineActiveSessionOwnerData>): UseDataConnectQueryResult<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+export function useGetMachineActiveSessionOwner(dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables, options?: useDataConnectQueryOptions<GetMachineActiveSessionOwnerData>): UseDataConnectQueryResult<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
 
 export function useGetMyActiveMachineSession(vars: GetMyActiveMachineSessionVariables, options?: useDataConnectQueryOptions<GetMyActiveMachineSessionData>): UseDataConnectQueryResult<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
 export function useGetMyActiveMachineSession(dc: DataConnect, vars: GetMyActiveMachineSessionVariables, options?: useDataConnectQueryOptions<GetMyActiveMachineSessionData>): UseDataConnectQueryResult<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
@@ -28,3 +31,9 @@ export function useOccupyMachine(dc: DataConnect, options?: useDataConnectMutati
 
 export function useForceCancelMyMachineSession(options?: useDataConnectMutationOptions<ForceCancelMyMachineSessionData, FirebaseError, ForceCancelMyMachineSessionVariables>): UseDataConnectMutationResult<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
 export function useForceCancelMyMachineSession(dc: DataConnect, options?: useDataConnectMutationOptions<ForceCancelMyMachineSessionData, FirebaseError, ForceCancelMyMachineSessionVariables>): UseDataConnectMutationResult<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+
+export function useGetSessionForReminderScheduling(vars: GetSessionForReminderSchedulingVariables, options?: useDataConnectQueryOptions<GetSessionForReminderSchedulingData>): UseDataConnectQueryResult<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+export function useGetSessionForReminderScheduling(dc: DataConnect, vars: GetSessionForReminderSchedulingVariables, options?: useDataConnectQueryOptions<GetSessionForReminderSchedulingData>): UseDataConnectQueryResult<GetSessionForReminderSchedulingData, GetSessionForReminderSchedulingVariables>;
+
+export function useSaveSessionReminderEmailId(options?: useDataConnectMutationOptions<SaveSessionReminderEmailIdData, FirebaseError, SaveSessionReminderEmailIdVariables>): UseDataConnectMutationResult<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;
+export function useSaveSessionReminderEmailId(dc: DataConnect, options?: useDataConnectMutationOptions<SaveSessionReminderEmailIdData, FirebaseError, SaveSessionReminderEmailIdVariables>): UseDataConnectMutationResult<SaveSessionReminderEmailIdData, SaveSessionReminderEmailIdVariables>;

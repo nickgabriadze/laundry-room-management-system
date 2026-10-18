@@ -1,5 +1,24 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+The LRMS dashboard separates machines currently in use by the signed-in student
+from the full machine list. Occupied machine detail pages also show the active
+occupant's email address.
+
+## Machine session email reminders
+
+The Next.js API schedules one Resend email for 10 minutes before a machine
+session ends. Force-cancelled sessions have their pending reminder cancelled.
+Set these server-side environment variables in the deployment environment:
+
+- `RESEND_API_KEY`: a Resend API key. Verify the sender domain in Resend first.
+- `EMAIL_FROM`: a sender address verified in Resend, such as
+  `Laundry Room <laundry@example.com>`.
+
+For local development, put these values in `.env.local` and do not commit
+them. Compile and deploy the Data Connect schema and operations after changing
+the connector with `npx firebase-tools dataconnect:compile` and
+`npx firebase-tools deploy --only dataconnect`.
+
 ## Getting Started
 
 First, run the development server:
