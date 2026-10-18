@@ -162,6 +162,6 @@ mutation ForceCancelMyMachineSession($machineId: UUID!)
         occupiedUntil: { gt_time: { now: true } }
       }
     }
-    data: { occupiedUntil_expr: "request.time" }
+    data: { occupiedUntil: null }
   ) @check(expr: "this != null", message: "This machine is no longer occupied.")
 }
