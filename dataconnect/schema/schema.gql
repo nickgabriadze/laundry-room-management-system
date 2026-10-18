@@ -20,7 +20,6 @@ type LaundryActivity @table {
   id: UUID!
   machine: Machine! @ref
   user: UserAccount!
-  isHeavyLoad: Boolean
   createdAt: Timestamp! @default(expr: "request.time")
   endsAt: Timestamp!
   wasForceCancelled: Boolean! @default(value: false)
