@@ -2,28 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import QRCode from "qrcode";
 import { onAuthStateChanged } from "firebase/auth";
 import { QueryFetchPolicy } from "firebase/data-connect";
 import { useRouter } from "next/navigation";
 import { auth } from "@/src/firebase";
 import { listMachinesByBuilding } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
-import { getMachineCodeMap } from "./machineCodes";
+import { createMachineLabels, type MachineLabel } from "../utils/machineLabels";
 import styles from "./MachineLabelsPage.module.css";
-
-type Label = {
-  code: string;
-  description: string;
-  url: string;
-  image: string;
-};
 
 type PageState = "loading" | "ready" | "error";
 
 export function MachineLabelsPage() {
   const router = useRouter();
-  const [labels, setLabels] = useState<Label[]>([]);
+  const [labels, setLabels] = useState<MachineLabel[]>([]);
   const [pageState, setPageState] = useState<PageState>("loading");
   const [error, setError] = useState("");
 
@@ -51,38 +43,12 @@ export function MachineLabelsPage() {
           );
           if (!active) return;
 
-          const codes = getMachineCodeMap(data.machines);
-          const origin = window.location.origin;
-          const machineLabels = await Promise.all(
-            data.machines.map(async (machine) => {
-              const code = codes.get(machine.id);
-              if (!code) {
-                throw new Error(`No machine code is available for ${machine.id}.`);
-              }
-
-              const url = new URL(
-                `/machine/${encodeURIComponent(code)}`,
-                origin,
-              ).toString();
-              const image = await QRCode.toDataURL(url, {
-                errorCorrectionLevel: "M",
-                margin: 2,
-                width: 256,
-              });
-
-              return {
-                code,
-                description: `${machine.type === "WASHER" ? "Washer" : "Dryer"} · Building ${machine.dormBuilding.slice(-1)}`,
-                url,
-                image,
-              };
-            }),
+          const machineLabels = await createMachineLabels(
+            data.machines,
+            window.location.origin,
           );
 
           if (!active) return;
-          machineLabels.sort((left, right) =>
-            left.code.localeCompare(right.code, undefined, { numeric: true }),
-          );
           setLabels(machineLabels);
           setPageState("ready");
         } catch {

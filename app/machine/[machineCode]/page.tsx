@@ -1,4 +1,4 @@
-import { MachinePage } from "@/src/dashboard/machines/MachinePage";
+import { MachinePage } from "@/src/dashboard/machines/detail/MachinePage";
 
 export default async function Page({
   params,

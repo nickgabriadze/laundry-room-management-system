@@ -11,9 +11,10 @@ import {
   listMachinesByBuilding,
 } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
-import { ApplianceIcon } from "./ApplianceIcon";
-import { MachineCard, type Machine } from "./Machine";
-import { getMachineCodeMap } from "./machineCodes";
+import { ApplianceIcon } from "../components/ApplianceIcon";
+import { MachineCard, type Machine } from "../components/MachineCard";
+import { getMachineCodeMap } from "../utils/machineCodes";
+import { getBuildingDisplayName, sortMachinesByCode } from "../utils/machinePresentation";
 import styles from "./MachineList.module.css";
 
 export function MachineList() {
@@ -48,7 +49,7 @@ export function MachineList() {
           { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
         );
         setMachines(data.machines);
-        setBuildingName(profile.dormBuilding.replace("BUILDING_", "Building "));
+        setBuildingName(getBuildingDisplayName(profile.dormBuilding));
       } catch {
         setError(
           "We couldn't load the machines. Check your connection and retry.",
@@ -82,13 +83,7 @@ export function MachineList() {
     (machine) => machine.type === selectedType,
   );
   const machineCodes = getMachineCodeMap(machines);
-  const orderedVisibleMachines = [...visibleMachines].sort((left, right) =>
-    (machineCodes.get(left.id) ?? left.id).localeCompare(
-      machineCodes.get(right.id) ?? right.id,
-      undefined,
-      { numeric: true },
-    ),
-  );
+  const orderedVisibleMachines = sortMachinesByCode(visibleMachines, machineCodes);
 
   if (isLoading) {
     return (

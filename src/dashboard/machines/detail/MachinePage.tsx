@@ -13,14 +13,14 @@ import {
 } from "@/src/dataconnect-generated";
 import type { GetMyActiveMachineSessionData } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
-import { ApplianceIcon } from "./ApplianceIcon";
-import type { Machine } from "./Machine";
-import { getMachineCodeMap } from "./machineCodes";
+import { ApplianceIcon } from "../components/ApplianceIcon";
+import type { Machine } from "../components/MachineCard";
+import { getMachineCodeMap } from "../utils/machineCodes";
 import {
   forceCancelMyMachineSessionById,
   MAX_WASHER_SESSION_MINUTES,
   startMachineSession,
-} from "./sessions";
+} from "../data/sessions";
 import styles from "./MachinePage.module.css";
 
 type PageState =

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ListMachinesByBuildingData } from "@/src/dataconnect-generated";
 import { ApplianceIcon } from "./ApplianceIcon";
-import styles from "./Machine.module.css";
+import styles from "./MachineCard.module.css";
 
 export type Machine = ListMachinesByBuildingData["machines"][number];
 
