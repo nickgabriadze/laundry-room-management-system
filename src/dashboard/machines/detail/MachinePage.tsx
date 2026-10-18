@@ -246,9 +246,11 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setMyActiveSession(null);
       setActiveSessionEmail("");
       setMessage(
-        cancellation.remindersCancelled
-          ? "The machine was stopped and is now available."
-          : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
+        cancellation.reminderStatus === "already-sent"
+          ? "The machine was stopped and is now available. The 10-minute reminder email had already been sent and can't be recalled."
+          : cancellation.remindersCancelled
+            ? "The machine was stopped and is now available."
+            : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
       );
       setIsMessageError(!cancellation.remindersCancelled);
       setPageState("ready");
