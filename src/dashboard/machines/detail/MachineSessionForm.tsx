@@ -80,7 +80,7 @@ export function MachineSessionForm({
           <span>
             <strong>Email reminder</strong>
             <span className={styles.reminderDescription}>
-              We'll email you 10 minutes before your laundry machine finishes.
+              We'll email you 10 minutes before your laundry machine finishes working.
             </span>
           </span>
         </aside>
