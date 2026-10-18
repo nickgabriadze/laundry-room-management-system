@@ -74,8 +74,8 @@ export default function SignInPage() {
           draggable="false"
         />
         <Image
-          src="/lms.svg"
-          alt="Laundry Management System"
+          src="/lrms.svg"
+          alt="Laundry Room Management System"
           width={200}
           height={200}
           priority

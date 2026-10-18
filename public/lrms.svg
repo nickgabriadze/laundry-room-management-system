@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 805 313" role="img" aria-labelledby="title">
+  <title id="title">Laundry Room Management System</title>
+  <g fill="#1e3a68">
+    <circle cx="35" cy="42" r="28"/>
+    <circle cx="35" cy="156" r="28" fill="#477dbb"/>
+    <circle cx="35" cy="270" r="28"/>
+    <path d="M112 0h115l-86 92-57 57-40-40 57-57z" fill="#477dbb"/>
+    <path d="M112 313h115l-86-92-57-57-40 40 57 57z"/>
+  </g>
+  <g fill="#1e3a68" font-family="Arial, Helvetica, sans-serif" font-weight="400">
+    <text x="300" y="77" font-size="54" letter-spacing=".5">LAUNDRY ROOM</text>
+    <text x="300" y="175" font-size="54" letter-spacing=".5">MANAGEMENT</text>
+    <text x="300" y="273" font-size="54" letter-spacing=".5">SYSTEM</text>
+  </g>
+</svg>

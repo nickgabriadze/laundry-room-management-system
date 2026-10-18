@@ -8,8 +8,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "LMS",
-  description: "Laundry Management System for KIU Dormitories",
+  title: "LRMS",
+  description: "Laundry Room Management System for KIU Dormitories",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
