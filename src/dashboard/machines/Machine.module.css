@@ -7,6 +7,22 @@
   box-shadow: 0 4px 14px rgb(23 54 74 / 5%);
 }
 
+.cardLink {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardLink:hover {
+  background: #fafdff;
+}
+
+.cardLink:focus-visible {
+  outline: 3px solid #1683c4;
+  outline-offset: -3px;
+}
+
 .cardTopline {
   display: flex;
   align-items: center;

@@ -19,10 +19,13 @@ You can also follow the instructions from the [Data Connect documentation](https
 - [**Queries**](#queries)
   - [*ListMachines*](#listmachines)
   - [*ListMachinesByBuilding*](#listmachinesbybuilding)
+  - [*GetMyActiveMachineSession*](#getmyactivemachinesession)
   - [*GetMyUserAccount*](#getmyuseraccount)
 - [**Mutations**](#mutations)
   - [*CreateMyUserAccount*](#createmyuseraccount)
   - [*UpdateMyBuilding*](#updatemybuilding)
+  - [*OccupyMachine*](#occupymachine)
+  - [*ForceCancelMyMachineSession*](#forcecancelmymachinesession)
 
 # TanStack Query Firebase & TanStack React Query
 This SDK provides [React](https://react.dev/) hooks generated specific to your application, for the operations found in the connector `example`. These hooks are generated using [TanStack Query Firebase](https://react-query-firebase.invertase.dev/) by our partners at Invertase, a library built on top of [TanStack React Query v5](https://tanstack.com/query/v5/docs/framework/react/overview).
@@ -220,6 +223,7 @@ export interface ListMachinesByBuildingData {
     dormBuilding: DormBuilding;
     activeSessions: ({
       id: UUIDString;
+      endsAt: TimestampString;
     } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
@@ -271,6 +275,91 @@ export default function ListMachinesByBuildingComponent() {
   // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
   if (query.isSuccess) {
     console.log(query.data.machines);
+  }
+  return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## GetMyActiveMachineSession
+You can execute the `GetMyActiveMachineSession` Query using the following Query hook function, which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts):
+
+```javascript
+useGetMyActiveMachineSession(dc: DataConnect, vars: GetMyActiveMachineSessionVariables, options?: useDataConnectQueryOptions<GetMyActiveMachineSessionData>): UseDataConnectQueryResult<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Query hook function.
+```javascript
+useGetMyActiveMachineSession(vars: GetMyActiveMachineSessionVariables, options?: useDataConnectQueryOptions<GetMyActiveMachineSessionData>): UseDataConnectQueryResult<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+```
+
+### Variables
+The `GetMyActiveMachineSession` Query requires an argument of type `GetMyActiveMachineSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface GetMyActiveMachineSessionVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `GetMyActiveMachineSession` Query hook function returns a `UseQueryResult` object. This object holds the state of your Query, including whether the Query is loading, has completed, or has succeeded/failed, and any data returned by the Query, among other things.
+
+To check the status of a Query, use the `UseQueryResult.status` field. You can also check for pending / success / error status using the `UseQueryResult.isPending`, `UseQueryResult.isSuccess`, and `UseQueryResult.isError` fields.
+
+To access the data returned by a Query, use the `UseQueryResult.data` field. The data for the `GetMyActiveMachineSession` Query is of type `GetMyActiveMachineSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface GetMyActiveMachineSessionData {
+  laundryActivities: ({
+    id: UUIDString;
+    endsAt: TimestampString;
+  } & LaundryActivity_Key)[];
+}
+```
+
+To learn more about the `UseQueryResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useQuery).
+
+### Using `GetMyActiveMachineSession`'s Query hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, GetMyActiveMachineSessionVariables } from '@dataconnect/generated';
+import { useGetMyActiveMachineSession } from '@dataconnect/generated/react'
+
+export default function GetMyActiveMachineSessionComponent() {
+  // The `useGetMyActiveMachineSession` Query hook requires an argument of type `GetMyActiveMachineSessionVariables`:
+  const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
+    machineId: ...,
+  };
+
+  // You don't have to do anything to "execute" the Query.
+  // Call the Query hook function to get a `UseQueryResult` object which holds the state of your Query.
+  const query = useGetMyActiveMachineSession(getMyActiveMachineSessionVars);
+  // Variables can be defined inline as well.
+  const query = useGetMyActiveMachineSession({ machineId: ..., });
+
+  // You can also pass in a `DataConnect` instance to the Query hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const query = useGetMyActiveMachineSession(dataConnect, getMyActiveMachineSessionVars);
+
+  // You can also pass in a `useDataConnectQueryOptions` object to the Query hook function.
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyActiveMachineSession(getMyActiveMachineSessionVars, options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectQueryOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = { staleTime: 5 * 1000 };
+  const query = useGetMyActiveMachineSession(dataConnect, getMyActiveMachineSessionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Query.
+  if (query.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (query.isError) {
+    return <div>Error: {query.error.message}</div>;
+  }
+
+  // If the Query is successful, you can access the data returned using the `UseQueryResult.data` field.
+  if (query.isSuccess) {
+    console.log(query.data.laundryActivities);
   }
   return <div>Query execution {query.isSuccess ? 'successful' : 'failed'}!</div>;
 }
@@ -563,3 +652,196 @@ export default function UpdateMyBuildingComponent() {
 }
 ```
 
+## OccupyMachine
+You can execute the `OccupyMachine` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useOccupyMachine(options?: useDataConnectMutationOptions<OccupyMachineData, FirebaseError, OccupyMachineVariables>): UseDataConnectMutationResult<OccupyMachineData, OccupyMachineVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useOccupyMachine(dc: DataConnect, options?: useDataConnectMutationOptions<OccupyMachineData, FirebaseError, OccupyMachineVariables>): UseDataConnectMutationResult<OccupyMachineData, OccupyMachineVariables>;
+```
+
+### Variables
+The `OccupyMachine` Mutation requires an argument of type `OccupyMachineVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface OccupyMachineVariables {
+  machineId: UUIDString;
+  endsAt: TimestampString;
+}
+```
+### Return Type
+Recall that calling the `OccupyMachine` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `OccupyMachine` Mutation is of type `OccupyMachineData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface OccupyMachineData {
+  machine_update?: Machine_Key | null;
+  laundryActivity_insert: LaundryActivity_Key;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `OccupyMachine`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, OccupyMachineVariables } from '@dataconnect/generated';
+import { useOccupyMachine } from '@dataconnect/generated/react'
+
+export default function OccupyMachineComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useOccupyMachine();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useOccupyMachine(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useOccupyMachine(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useOccupyMachine(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useOccupyMachine` Mutation requires an argument of type `OccupyMachineVariables`:
+  const occupyMachineVars: OccupyMachineVariables = {
+    machineId: ...,
+    endsAt: ...,
+  };
+  mutation.mutate(occupyMachineVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ machineId: ..., endsAt: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(occupyMachineVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.machine_update);
+    console.log(mutation.data.laundryActivity_insert);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```
+
+## ForceCancelMyMachineSession
+You can execute the `ForceCancelMyMachineSession` Mutation using the `UseMutationResult` object returned by the following Mutation hook function (which is defined in [dataconnect-generated/react/index.d.ts](./index.d.ts)):
+```javascript
+useForceCancelMyMachineSession(options?: useDataConnectMutationOptions<ForceCancelMyMachineSessionData, FirebaseError, ForceCancelMyMachineSessionVariables>): UseDataConnectMutationResult<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+```
+You can also pass in a `DataConnect` instance to the Mutation hook function.
+```javascript
+useForceCancelMyMachineSession(dc: DataConnect, options?: useDataConnectMutationOptions<ForceCancelMyMachineSessionData, FirebaseError, ForceCancelMyMachineSessionVariables>): UseDataConnectMutationResult<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+```
+
+### Variables
+The `ForceCancelMyMachineSession` Mutation requires an argument of type `ForceCancelMyMachineSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+
+```javascript
+export interface ForceCancelMyMachineSessionVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that calling the `ForceCancelMyMachineSession` Mutation hook function returns a `UseMutationResult` object. This object holds the state of your Mutation, including whether the Mutation is loading, has completed, or has succeeded/failed, among other things.
+
+To check the status of a Mutation, use the `UseMutationResult.status` field. You can also check for pending / success / error status using the `UseMutationResult.isPending`, `UseMutationResult.isSuccess`, and `UseMutationResult.isError` fields.
+
+To execute the Mutation, call `UseMutationResult.mutate()`. This function executes the Mutation, but does not return the data from the Mutation.
+
+To access the data returned by a Mutation, use the `UseMutationResult.data` field. The data for the `ForceCancelMyMachineSession` Mutation is of type `ForceCancelMyMachineSessionData`, which is defined in [dataconnect-generated/index.d.ts](../index.d.ts). It has the following fields:
+```javascript
+export interface ForceCancelMyMachineSessionData {
+  laundryActivity_update?: LaundryActivity_Key | null;
+  machine_update?: Machine_Key | null;
+}
+```
+
+To learn more about the `UseMutationResult` object, see the [TanStack React Query documentation](https://tanstack.com/query/v5/docs/framework/react/reference/useMutation).
+
+### Using `ForceCancelMyMachineSession`'s Mutation hook function
+
+```javascript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, ForceCancelMyMachineSessionVariables } from '@dataconnect/generated';
+import { useForceCancelMyMachineSession } from '@dataconnect/generated/react'
+
+export default function ForceCancelMyMachineSessionComponent() {
+  // Call the Mutation hook function to get a `UseMutationResult` object which holds the state of your Mutation.
+  const mutation = useForceCancelMyMachineSession();
+
+  // You can also pass in a `DataConnect` instance to the Mutation hook function.
+  const dataConnect = getDataConnect(connectorConfig);
+  const mutation = useForceCancelMyMachineSession(dataConnect);
+
+  // You can also pass in a `useDataConnectMutationOptions` object to the Mutation hook function.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useForceCancelMyMachineSession(options);
+
+  // You can also pass both a `DataConnect` instance and a `useDataConnectMutationOptions` object.
+  const dataConnect = getDataConnect(connectorConfig);
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  const mutation = useForceCancelMyMachineSession(dataConnect, options);
+
+  // After calling the Mutation hook function, you must call `UseMutationResult.mutate()` to execute the Mutation.
+  // The `useForceCancelMyMachineSession` Mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
+  const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
+    machineId: ...,
+  };
+  mutation.mutate(forceCancelMyMachineSessionVars);
+  // Variables can be defined inline as well.
+  mutation.mutate({ machineId: ..., });
+
+  // You can also pass in a `useDataConnectMutationOptions` object to `UseMutationResult.mutate()`.
+  const options = {
+    onSuccess: () => { console.log('Mutation succeeded!'); }
+  };
+  mutation.mutate(forceCancelMyMachineSessionVars, options);
+
+  // Then, you can render your component dynamically based on the status of the Mutation.
+  if (mutation.isPending) {
+    return <div>Loading...</div>;
+  }
+
+  if (mutation.isError) {
+    return <div>Error: {mutation.error.message}</div>;
+  }
+
+  // If the Mutation is successful, you can access the data returned using the `UseMutationResult.data` field.
+  if (mutation.isSuccess) {
+    console.log(mutation.data.laundryActivity_update);
+    console.log(mutation.data.machine_update);
+  }
+  return <div>Mutation execution {mutation.isSuccess ? 'successful' : 'failed'}!</div>;
+}
+```

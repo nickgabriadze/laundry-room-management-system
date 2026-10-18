@@ -47,6 +47,19 @@ export function listMachinesByBuilding(dcOrVars, varsOrOptions, options) {
   return executeQuery(listMachinesByBuildingRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 
+export const getMyActiveMachineSessionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMyActiveMachineSession', inputVars);
+}
+getMyActiveMachineSessionRef.operationName = 'GetMyActiveMachineSession';
+
+export function getMyActiveMachineSession(dcOrVars, varsOrOptions, options) {
+
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMyActiveMachineSessionRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+
 export const getMyUserAccountRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();
@@ -84,3 +97,26 @@ export function updateMyBuilding(dcOrVars, vars) {
   return executeMutation(updateMyBuildingRef(dcInstance, inputVars));
 }
 
+export const occupyMachineRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'OccupyMachine', inputVars);
+}
+occupyMachineRef.operationName = 'OccupyMachine';
+
+export function occupyMachine(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(occupyMachineRef(dcInstance, inputVars));
+}
+
+export const forceCancelMyMachineSessionRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ForceCancelMyMachineSession', inputVars);
+}
+forceCancelMyMachineSessionRef.operationName = 'ForceCancelMyMachineSession';
+
+export function forceCancelMyMachineSession(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(forceCancelMyMachineSessionRef(dcInstance, inputVars));
+}

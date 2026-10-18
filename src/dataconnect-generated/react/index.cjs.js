@@ -1,4 +1,4 @@
-const { listMachinesRef, listMachinesByBuildingRef, getMyUserAccountRef, createMyUserAccountRef, updateMyBuildingRef, connectorConfig } = require('../index.cjs.js');
+const { listMachinesRef, listMachinesByBuildingRef, getMyActiveMachineSessionRef, getMyUserAccountRef, createMyUserAccountRef, updateMyBuildingRef, occupyMachineRef, forceCancelMyMachineSessionRef, connectorConfig } = require('../index.cjs.js');
 const { validateArgs, CallerSdkTypeEnum } = require('firebase/data-connect');
 const { useDataConnectQuery, useDataConnectMutation, validateReactArgs } = require('@tanstack-query-firebase/react/data-connect');
 
@@ -12,6 +12,12 @@ exports.useListMachines = function useListMachines(dcOrOptions, options) {
 exports.useListMachinesByBuilding = function useListMachinesByBuilding(dcOrVars, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   const ref = listMachinesByBuildingRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useGetMyActiveMachineSession = function useGetMyActiveMachineSession(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getMyActiveMachineSessionRef(dcInstance, inputVars);
   return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 
@@ -32,6 +38,22 @@ exports.useUpdateMyBuilding = function useUpdateMyBuilding(dcOrOptions, options)
   const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
   function refFactory(vars) {
     return updateMyBuildingRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useOccupyMachine = function useOccupyMachine(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return occupyMachineRef(dcInstance, vars);
+  }
+  return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+exports.useForceCancelMyMachineSession = function useForceCancelMyMachineSession(dcOrOptions, options) {
+  const { dc: dcInstance, vars: inputOpts } = validateArgs(connectorConfig, dcOrOptions, options);
+  function refFactory(vars) {
+    return forceCancelMyMachineSessionRef(dcInstance, vars);
   }
   return useDataConnectMutation(refFactory, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }

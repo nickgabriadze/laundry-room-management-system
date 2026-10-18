@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ListMachinesByBuildingData } from "@/src/dataconnect-generated";
 import { ApplianceIcon } from "./ApplianceIcon";
 import styles from "./Machine.module.css";
@@ -18,22 +19,24 @@ export function MachineCard({
     <li
       className={`${styles.machineCard} ${isInUse ? styles.inUse : styles.available}`}
     >
-      <div className={styles.cardTopline}>
-        <span className={styles.machineId}>{label}</span>
-        <span className={styles.status}>
-          <i aria-hidden="true" />
-          {isInUse ? "In use" : "Available"}
-        </span>
-      </div>
+      <Link className={styles.cardLink} href={`/machine/${machine.id}`}>
+        <div className={styles.cardTopline}>
+          <span className={styles.machineId}>{label}</span>
+          <span className={styles.status}>
+            <i aria-hidden="true" />
+            {isInUse ? "In use" : "Available"}
+          </span>
+        </div>
 
-      <div className={styles.applianceArea}>
-        <ApplianceIcon type={machine.type} isInUse={isInUse} />
-      </div>
+        <div className={styles.applianceArea}>
+          <ApplianceIcon type={machine.type} isInUse={isInUse} />
+        </div>
 
-      <div className={styles.cardFooter}>
-        <h2>{kind}</h2>
-        <span>{isInUse ? "Running" : "Ready for a load"}</span>
-      </div>
+        <div className={styles.cardFooter}>
+          <h2>{kind}</h2>
+          <span>{isInUse ? "View session" : "Select a duration"}</span>
+        </div>
+      </Link>
     </li>
   );
 }

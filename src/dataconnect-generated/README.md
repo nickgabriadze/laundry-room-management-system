@@ -12,10 +12,13 @@ This README will guide you through the process of using the generated JavaScript
 - [**Queries**](#queries)
   - [*ListMachines*](#listmachines)
   - [*ListMachinesByBuilding*](#listmachinesbybuilding)
+  - [*GetMyActiveMachineSession*](#getmyactivemachinesession)
   - [*GetMyUserAccount*](#getmyuseraccount)
 - [**Mutations**](#mutations)
   - [*CreateMyUserAccount*](#createmyuseraccount)
   - [*UpdateMyBuilding*](#updatemybuilding)
+  - [*OccupyMachine*](#occupymachine)
+  - [*ForceCancelMyMachineSession*](#forcecancelmymachinesession)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `example`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -206,6 +209,7 @@ export interface ListMachinesByBuildingData {
     dormBuilding: DormBuilding;
     activeSessions: ({
       id: UUIDString;
+      endsAt: TimestampString;
     } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
@@ -270,6 +274,118 @@ console.log(data.machines);
 executeQuery(ref).then((response) => {
   const data = response.data;
   console.log(data.machines);
+});
+```
+
+## GetMyActiveMachineSession
+You can execute the `GetMyActiveMachineSession` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+getMyActiveMachineSession(vars: GetMyActiveMachineSessionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+
+interface GetMyActiveMachineSessionRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMyActiveMachineSessionVariables): QueryRef<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+}
+export const getMyActiveMachineSessionRef: GetMyActiveMachineSessionRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMyActiveMachineSession(dc: DataConnect, vars: GetMyActiveMachineSessionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+
+interface GetMyActiveMachineSessionRef {
+  ...
+  (dc: DataConnect, vars: GetMyActiveMachineSessionVariables): QueryRef<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+}
+export const getMyActiveMachineSessionRef: GetMyActiveMachineSessionRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMyActiveMachineSessionRef:
+```typescript
+const name = getMyActiveMachineSessionRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMyActiveMachineSession` query requires an argument of type `GetMyActiveMachineSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetMyActiveMachineSessionVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetMyActiveMachineSession` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMyActiveMachineSessionData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMyActiveMachineSessionData {
+  laundryActivities: ({
+    id: UUIDString;
+    endsAt: TimestampString;
+  } & LaundryActivity_Key)[];
+}
+```
+### Using `GetMyActiveMachineSession`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMyActiveMachineSession, GetMyActiveMachineSessionVariables } from '@dataconnect/generated';
+
+// The `GetMyActiveMachineSession` query requires an argument of type `GetMyActiveMachineSessionVariables`:
+const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
+  machineId: ...,
+};
+
+// Call the `getMyActiveMachineSession()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMyActiveMachineSession(getMyActiveMachineSessionVars);
+// Variables can be defined inline as well.
+const { data } = await getMyActiveMachineSession({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMyActiveMachineSession(dataConnect, getMyActiveMachineSessionVars);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+getMyActiveMachineSession(getMyActiveMachineSessionVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
+});
+```
+
+### Using `GetMyActiveMachineSession`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMyActiveMachineSessionRef, GetMyActiveMachineSessionVariables } from '@dataconnect/generated';
+
+// The `GetMyActiveMachineSession` query requires an argument of type `GetMyActiveMachineSessionVariables`:
+const getMyActiveMachineSessionVars: GetMyActiveMachineSessionVariables = {
+  machineId: ...,
+};
+
+// Call the `getMyActiveMachineSessionRef()` function to get a reference to the query.
+const ref = getMyActiveMachineSessionRef(getMyActiveMachineSessionVars);
+// Variables can be defined inline as well.
+const ref = getMyActiveMachineSessionRef({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMyActiveMachineSessionRef(dataConnect, getMyActiveMachineSessionVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
 });
 ```
 
@@ -602,3 +718,233 @@ executeMutation(ref).then((response) => {
 });
 ```
 
+## OccupyMachine
+You can execute the `OccupyMachine` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+occupyMachine(vars: OccupyMachineVariables): MutationPromise<OccupyMachineData, OccupyMachineVariables>;
+
+interface OccupyMachineRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: OccupyMachineVariables): MutationRef<OccupyMachineData, OccupyMachineVariables>;
+}
+export const occupyMachineRef: OccupyMachineRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+occupyMachine(dc: DataConnect, vars: OccupyMachineVariables): MutationPromise<OccupyMachineData, OccupyMachineVariables>;
+
+interface OccupyMachineRef {
+  ...
+  (dc: DataConnect, vars: OccupyMachineVariables): MutationRef<OccupyMachineData, OccupyMachineVariables>;
+}
+export const occupyMachineRef: OccupyMachineRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the occupyMachineRef:
+```typescript
+const name = occupyMachineRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `OccupyMachine` mutation requires an argument of type `OccupyMachineVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface OccupyMachineVariables {
+  machineId: UUIDString;
+  endsAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `OccupyMachine` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `OccupyMachineData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface OccupyMachineData {
+  machine_update?: Machine_Key | null;
+  laundryActivity_insert: LaundryActivity_Key;
+}
+```
+### Using `OccupyMachine`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, occupyMachine, OccupyMachineVariables } from '@dataconnect/generated';
+
+// The `OccupyMachine` mutation requires an argument of type `OccupyMachineVariables`:
+const occupyMachineVars: OccupyMachineVariables = {
+  machineId: ...,
+  endsAt: ...,
+};
+
+// Call the `occupyMachine()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await occupyMachine(occupyMachineVars);
+// Variables can be defined inline as well.
+const { data } = await occupyMachine({ machineId: ..., endsAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await occupyMachine(dataConnect, occupyMachineVars);
+
+console.log(data.machine_update);
+console.log(data.laundryActivity_insert);
+
+// Or, you can use the `Promise` API.
+occupyMachine(occupyMachineVars).then((response) => {
+  const data = response.data;
+  console.log(data.machine_update);
+  console.log(data.laundryActivity_insert);
+});
+```
+
+### Using `OccupyMachine`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, occupyMachineRef, OccupyMachineVariables } from '@dataconnect/generated';
+
+// The `OccupyMachine` mutation requires an argument of type `OccupyMachineVariables`:
+const occupyMachineVars: OccupyMachineVariables = {
+  machineId: ...,
+  endsAt: ...,
+};
+
+// Call the `occupyMachineRef()` function to get a reference to the mutation.
+const ref = occupyMachineRef(occupyMachineVars);
+// Variables can be defined inline as well.
+const ref = occupyMachineRef({ machineId: ..., endsAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = occupyMachineRef(dataConnect, occupyMachineVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.machine_update);
+console.log(data.laundryActivity_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.machine_update);
+  console.log(data.laundryActivity_insert);
+});
+```
+
+## ForceCancelMyMachineSession
+You can execute the `ForceCancelMyMachineSession` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+forceCancelMyMachineSession(vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+
+interface ForceCancelMyMachineSessionRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ForceCancelMyMachineSessionVariables): MutationRef<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+}
+export const forceCancelMyMachineSessionRef: ForceCancelMyMachineSessionRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+forceCancelMyMachineSession(dc: DataConnect, vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+
+interface ForceCancelMyMachineSessionRef {
+  ...
+  (dc: DataConnect, vars: ForceCancelMyMachineSessionVariables): MutationRef<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+}
+export const forceCancelMyMachineSessionRef: ForceCancelMyMachineSessionRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the forceCancelMyMachineSessionRef:
+```typescript
+const name = forceCancelMyMachineSessionRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ForceCancelMyMachineSession` mutation requires an argument of type `ForceCancelMyMachineSessionVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ForceCancelMyMachineSessionVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `ForceCancelMyMachineSession` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ForceCancelMyMachineSessionData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ForceCancelMyMachineSessionData {
+  laundryActivity_update?: LaundryActivity_Key | null;
+  machine_update?: Machine_Key | null;
+}
+```
+### Using `ForceCancelMyMachineSession`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, forceCancelMyMachineSession, ForceCancelMyMachineSessionVariables } from '@dataconnect/generated';
+
+// The `ForceCancelMyMachineSession` mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
+const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
+  machineId: ...,
+};
+
+// Call the `forceCancelMyMachineSession()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await forceCancelMyMachineSession(forceCancelMyMachineSessionVars);
+// Variables can be defined inline as well.
+const { data } = await forceCancelMyMachineSession({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await forceCancelMyMachineSession(dataConnect, forceCancelMyMachineSessionVars);
+
+console.log(data.laundryActivity_update);
+console.log(data.machine_update);
+
+// Or, you can use the `Promise` API.
+forceCancelMyMachineSession(forceCancelMyMachineSessionVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity_update);
+  console.log(data.machine_update);
+});
+```
+
+### Using `ForceCancelMyMachineSession`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, forceCancelMyMachineSessionRef, ForceCancelMyMachineSessionVariables } from '@dataconnect/generated';
+
+// The `ForceCancelMyMachineSession` mutation requires an argument of type `ForceCancelMyMachineSessionVariables`:
+const forceCancelMyMachineSessionVars: ForceCancelMyMachineSessionVariables = {
+  machineId: ...,
+};
+
+// Call the `forceCancelMyMachineSessionRef()` function to get a reference to the mutation.
+const ref = forceCancelMyMachineSessionRef(forceCancelMyMachineSessionVars);
+// Variables can be defined inline as well.
+const ref = forceCancelMyMachineSessionRef({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = forceCancelMyMachineSessionRef(dataConnect, forceCancelMyMachineSessionVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.laundryActivity_update);
+console.log(data.machine_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivity_update);
+  console.log(data.machine_update);
+});
+```

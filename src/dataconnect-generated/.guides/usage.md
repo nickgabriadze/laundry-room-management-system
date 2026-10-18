@@ -12,18 +12,24 @@ For each operation, there is a wrapper hook that can be used to call the operati
 
 Here are all of the hooks that get generated:
 ```ts
-import { useListMachines, useListMachinesByBuilding, useGetMyUserAccount, useCreateMyUserAccount, useUpdateMyBuilding } from '@dataconnect/generated/react';
+import { useListMachines, useListMachinesByBuilding, useGetMyActiveMachineSession, useGetMyUserAccount, useCreateMyUserAccount, useUpdateMyBuilding, useOccupyMachine, useForceCancelMyMachineSession } from '@dataconnect/generated/react';
 // The types of these hooks are available in react/index.d.ts
 
 const { data, isPending, isSuccess, isError, error } = useListMachines();
 
 const { data, isPending, isSuccess, isError, error } = useListMachinesByBuilding(listMachinesByBuildingVars);
 
+const { data, isPending, isSuccess, isError, error } = useGetMyActiveMachineSession(getMyActiveMachineSessionVars);
+
 const { data, isPending, isSuccess, isError, error } = useGetMyUserAccount();
 
 const { data, isPending, isSuccess, isError, error } = useCreateMyUserAccount(createMyUserAccountVars);
 
 const { data, isPending, isSuccess, isError, error } = useUpdateMyBuilding(updateMyBuildingVars);
+
+const { data, isPending, isSuccess, isError, error } = useOccupyMachine(occupyMachineVars);
+
+const { data, isPending, isSuccess, isError, error } = useForceCancelMyMachineSession(forceCancelMyMachineSessionVars);
 
 ```
 
@@ -62,7 +68,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { listMachines, listMachinesByBuilding, getMyUserAccount, createMyUserAccount, updateMyBuilding } from '@dataconnect/generated';
+import { listMachines, listMachinesByBuilding, getMyActiveMachineSession, getMyUserAccount, createMyUserAccount, updateMyBuilding, occupyMachine, forceCancelMyMachineSession } from '@dataconnect/generated';
 
 
 // Operation ListMachines: 
@@ -70,6 +76,9 @@ const { data } = await ListMachines(dataConnect);
 
 // Operation ListMachinesByBuilding:  For variables, look at type ListMachinesByBuildingVars in ../index.d.ts
 const { data } = await ListMachinesByBuilding(dataConnect, listMachinesByBuildingVars);
+
+// Operation GetMyActiveMachineSession:  For variables, look at type GetMyActiveMachineSessionVars in ../index.d.ts
+const { data } = await GetMyActiveMachineSession(dataConnect, getMyActiveMachineSessionVars);
 
 // Operation GetMyUserAccount: 
 const { data } = await GetMyUserAccount(dataConnect);
@@ -79,6 +88,12 @@ const { data } = await CreateMyUserAccount(dataConnect, createMyUserAccountVars)
 
 // Operation UpdateMyBuilding:  For variables, look at type UpdateMyBuildingVars in ../index.d.ts
 const { data } = await UpdateMyBuilding(dataConnect, updateMyBuildingVars);
+
+// Operation OccupyMachine:  For variables, look at type OccupyMachineVars in ../index.d.ts
+const { data } = await OccupyMachine(dataConnect, occupyMachineVars);
+
+// Operation ForceCancelMyMachineSession:  For variables, look at type ForceCancelMyMachineSessionVars in ../index.d.ts
+const { data } = await ForceCancelMyMachineSession(dataConnect, forceCancelMyMachineSessionVars);
 
 
 ```

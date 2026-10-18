@@ -1,0 +1,246 @@
+.page {
+  min-height: 100svh;
+  background: #f3f7fa;
+  color: #183044;
+}
+
+.topbar {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid #d6e4ef;
+  background: #fff;
+}
+
+.backLink {
+  color: #126fa8;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.backLink:focus-visible,
+.secondaryButton:focus-visible,
+.primaryButton:focus-visible,
+.forceCancelButton:focus-visible,
+.durationInput:focus-visible {
+  outline: 3px solid #1683c4;
+  outline-offset: 3px;
+}
+
+.panel {
+  width: min(100% - 40px, 520px);
+  margin: 52px auto;
+  padding: 32px;
+  border: 1px solid #dbe5ec;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgb(23 54 74 / 6%);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #1678aa;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.panel h1 {
+  margin: 0;
+  color: #203c50;
+  font-size: 28px;
+  font-weight: 650;
+}
+
+.applianceArea {
+  display: grid;
+  min-height: 190px;
+  place-items: center;
+  margin: 24px 0;
+  border-radius: 6px;
+  background: #eef6fa;
+}
+
+.applianceAreaOccupied {
+  background: #fff5e8;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.durationLabel {
+  color: #324b5f;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.durationInput {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #bed3e0;
+  border-radius: 5px;
+  color: #183044;
+  font: inherit;
+  font-size: 16px;
+}
+
+.hint {
+  margin: 0;
+  color: #657b8c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.primaryButton {
+  margin-top: 8px;
+  background: #126fa8;
+  color: #fff;
+  cursor: pointer;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #0c5d91;
+}
+
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.secondaryButton {
+  border: 1px solid #bed3e0;
+  background: #fff;
+  color: #176b96;
+  cursor: pointer;
+}
+
+.cancelSection {
+  margin-top: 16px;
+}
+
+.forceCancelButton {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border: 1px solid #b42318;
+  border-radius: 5px;
+  background: #fff;
+  color: #b42318;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.forceCancelButton:hover:not(:disabled) {
+  background: #fff4f2;
+}
+
+.forceCancelButton:disabled,
+.secondaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.confirmation {
+  padding: 16px;
+  border: 1px solid #edc5c0;
+  border-radius: 6px;
+  background: #fff8f7;
+}
+
+.confirmation h2 {
+  margin: 0;
+  color: #81251d;
+  font-size: 16px;
+}
+
+.confirmation p {
+  margin: 8px 0 14px;
+  color: #70413c;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.confirmationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.occupied {
+  padding: 16px;
+  border-left: 3px solid #e7942d;
+  background: #fff5e8;
+}
+
+.occupied h2 {
+  margin: 0;
+  color: #75420a;
+  font-size: 16px;
+}
+
+.occupied p {
+  margin: 8px 0 0;
+  color: #765b3a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message,
+.success,
+.error {
+  color: #526b7c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.message p {
+  margin: 8px 0 16px;
+}
+
+.success {
+  margin: 16px 0 0;
+  color: #226a45;
+}
+
+.error {
+  margin: 16px 0 0;
+  color: #b42318;
+}
+
+@media (max-width: 520px) {
+  .topbar {
+    padding-inline: 20px;
+  }
+
+  .panel {
+    margin-top: 28px;
+    padding: 24px 20px;
+  }
+}

@@ -29,4 +29,5 @@ type Machine @table {
   id: UUID! @default(expr: "uuidV4()")
   type: MachineType!
   dormBuilding: DormBuilding!
+  occupiedUntil: Timestamp
 }

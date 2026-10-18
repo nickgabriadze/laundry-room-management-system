@@ -30,6 +30,26 @@ export interface CreateMyUserAccountVariables {
   dormBuilding: DormBuilding;
 }
 
+export interface ForceCancelMyMachineSessionData {
+  laundryActivity_update?: LaundryActivity_Key | null;
+  machine_update?: Machine_Key | null;
+}
+
+export interface ForceCancelMyMachineSessionVariables {
+  machineId: UUIDString;
+}
+
+export interface GetMyActiveMachineSessionData {
+  laundryActivities: ({
+    id: UUIDString;
+    endsAt: TimestampString;
+  } & LaundryActivity_Key)[];
+}
+
+export interface GetMyActiveMachineSessionVariables {
+  machineId: UUIDString;
+}
+
 export interface GetMyUserAccountData {
   userAccount?: {
     uid: string;
@@ -51,6 +71,7 @@ export interface ListMachinesByBuildingData {
     dormBuilding: DormBuilding;
     activeSessions: ({
       id: UUIDString;
+      endsAt: TimestampString;
     } & LaundryActivity_Key)[];
   } & Machine_Key)[];
 }
@@ -70,6 +91,16 @@ export interface ListMachinesData {
 export interface Machine_Key {
   id: UUIDString;
   __typename?: 'Machine_Key';
+}
+
+export interface OccupyMachineData {
+  machine_update?: Machine_Key | null;
+  laundryActivity_insert: LaundryActivity_Key;
+}
+
+export interface OccupyMachineVariables {
+  machineId: UUIDString;
+  endsAt: TimestampString;
 }
 
 export interface UpdateMyBuildingData {
@@ -109,6 +140,18 @@ export const listMachinesByBuildingRef: ListMachinesByBuildingRef;
 export function listMachinesByBuilding(vars: ListMachinesByBuildingVariables, options?: ExecuteQueryOptions): QueryPromise<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
 export function listMachinesByBuilding(dc: DataConnect, vars: ListMachinesByBuildingVariables, options?: ExecuteQueryOptions): QueryPromise<ListMachinesByBuildingData, ListMachinesByBuildingVariables>;
 
+interface GetMyActiveMachineSessionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMyActiveMachineSessionVariables): QueryRef<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMyActiveMachineSessionVariables): QueryRef<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+  operationName: string;
+}
+export const getMyActiveMachineSessionRef: GetMyActiveMachineSessionRef;
+
+export function getMyActiveMachineSession(vars: GetMyActiveMachineSessionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+export function getMyActiveMachineSession(dc: DataConnect, vars: GetMyActiveMachineSessionVariables, options?: ExecuteQueryOptions): QueryPromise<GetMyActiveMachineSessionData, GetMyActiveMachineSessionVariables>;
+
 interface GetMyUserAccountRef {
   /* Allow users to create refs without passing in DataConnect */
   (): QueryRef<GetMyUserAccountData, undefined>;
@@ -144,4 +187,28 @@ export const updateMyBuildingRef: UpdateMyBuildingRef;
 
 export function updateMyBuilding(vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
 export function updateMyBuilding(dc: DataConnect, vars: UpdateMyBuildingVariables): MutationPromise<UpdateMyBuildingData, UpdateMyBuildingVariables>;
+
+interface OccupyMachineRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: OccupyMachineVariables): MutationRef<OccupyMachineData, OccupyMachineVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: OccupyMachineVariables): MutationRef<OccupyMachineData, OccupyMachineVariables>;
+  operationName: string;
+}
+export const occupyMachineRef: OccupyMachineRef;
+
+export function occupyMachine(vars: OccupyMachineVariables): MutationPromise<OccupyMachineData, OccupyMachineVariables>;
+export function occupyMachine(dc: DataConnect, vars: OccupyMachineVariables): MutationPromise<OccupyMachineData, OccupyMachineVariables>;
+
+interface ForceCancelMyMachineSessionRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ForceCancelMyMachineSessionVariables): MutationRef<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ForceCancelMyMachineSessionVariables): MutationRef<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+  operationName: string;
+}
+export const forceCancelMyMachineSessionRef: ForceCancelMyMachineSessionRef;
+
+export function forceCancelMyMachineSession(vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
+export function forceCancelMyMachineSession(dc: DataConnect, vars: ForceCancelMyMachineSessionVariables): MutationPromise<ForceCancelMyMachineSessionData, ForceCancelMyMachineSessionVariables>;
 
