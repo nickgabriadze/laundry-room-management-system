@@ -23,6 +23,7 @@ type LaundryActivity @table {
   isHeavyLoad: Boolean
   createdAt: Timestamp! @default(expr: "request.time")
   endsAt: Timestamp!
+  wasForceCancelled: Boolean! @default(value: false)
 }
 
 type Machine @table {

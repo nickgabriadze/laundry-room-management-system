@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sql:compile:deploy": "npx firebase-tools dataconnect:compile && npx firebase-tools deploy --only dataconnect"
   },
   "dependencies": {
     "firebase": "^13.0.0",

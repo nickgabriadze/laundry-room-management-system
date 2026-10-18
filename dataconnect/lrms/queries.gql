@@ -150,7 +150,10 @@ mutation ForceCancelMyMachineSession($machineId: UUID!)
         ]
       }
     }
-    data: { endsAt_expr: "request.time" }
+    data: {
+      endsAt_expr: "request.time"
+      wasForceCancelled: true
+    }
   ) @check(expr: "this != null", message: "You don't have an active session on this machine.")
   machine_update(
     first: {
