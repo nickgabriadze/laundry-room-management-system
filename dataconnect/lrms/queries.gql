@@ -193,66 +193,6 @@ mutation ForceCancelMyMachineSession($machineId: UUID!)
   ) @check(expr: "this != null", message: "This machine is no longer occupied.")
 }
 
-mutation OccupyWasherMachine($machineId: UUID!, $endsAt: Timestamp!)
-  @retired
-  @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.endsAt > request.time")
-  @transaction {
-  query @redact {
-    machine(key: { id: $machineId })
-      @check(expr: "this != null", message: "This machine is unavailable.")
-      @check(expr: "this.type == 'WASHER'", message: "This operation is only for washers.")
-      @check(
-        expr: "vars.endsAt - request.time <= duration('7200s')"
-        message: "Washer sessions cannot exceed 120 minutes."
-      ) {
-      type
-    }
-    userAccount(key: { uid_expr: "auth.uid" })
-      @check(expr: "this != null", message: "Complete your profile first.") {
-      dormBuilding
-    }
-    laundryActivities(
-      where: {
-        userUid: { eq_expr: "auth.uid" }
-        endsAt: { gt_time: { now: true } }
-      }
-    )
-      @check(
-        expr: "this.exists(session, session.machine.type == 'WASHER') == false"
-        message: "You already have a washer in use."
-      ) {
-      machineId
-      userUid
-      machine {
-        type
-      }
-    }
-  }
-  machine_update(
-    first: {
-      where: {
-        _and: [
-          { id: { eq: $machineId } }
-          { dormBuilding: { eq_expr: "response.query.userAccount.dormBuilding" } }
-          {
-            _or: [
-              { occupiedUntil: { isNull: true } }
-              { occupiedUntil: { lt_time: { now: true } } }
-            ]
-          }
-        ]
-      }
-    }
-    data: { occupiedUntil: $endsAt }
-  ) @check(expr: "this != null", message: "This machine is already in use.")
-  laundryActivity_insert(data: {
-    id_expr: "uuidV4()"
-    machineId: $machineId
-    userUid_expr: "auth.uid"
-    endsAt: $endsAt
-  })
-}
-
 mutation OccupyDryerMachine($machineId: UUID!, $endsAt: Timestamp!)
   @retired
   @auth(expr: "auth != null && auth.token.firebase.sign_in_provider != 'anonymous' && vars.endsAt > request.time")
