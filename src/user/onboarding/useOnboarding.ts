@@ -17,6 +17,7 @@ type PageState = "checking" | "ready" | "saving" | "error";
 export function useOnboarding() {
   const router = useRouter();
   const [building, setBuilding] = useState<BuildingSelection>("");
+  const [guidelinesAccepted, setGuidelinesAccepted] = useState(false);
   const [userEmail, setUserEmail] = useState<string | undefined>();
   const [pageState, setPageState] = useState<PageState>("checking");
   const [error, setError] = useState("");
@@ -57,7 +58,7 @@ export function useOnboarding() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!building || !getFirebaseAuth().currentUser) return;
+    if (!building || !guidelinesAccepted || !getFirebaseAuth().currentUser) return;
 
     setPageState("saving");
     setError("");
@@ -86,6 +87,8 @@ export function useOnboarding() {
   return {
     building,
     setBuilding,
+    guidelinesAccepted,
+    setGuidelinesAccepted,
     pageState,
     error,
     setError,

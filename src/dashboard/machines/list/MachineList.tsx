@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getFirebaseAuth } from "@/src/firebase";
 import {
+  DormBuilding,
   MachineType,
   listMachinesByBuilding,
 } from "@/src/dataconnect-generated";
@@ -15,11 +16,15 @@ import { ApplianceIcon } from "../components/ApplianceIcon";
 import { MachineCard, type Machine } from "../components/MachineCard";
 import { ContactPopover } from "../components/ContactPopover";
 import { getMachineCodeMap } from "../utils/machineCodes";
-import { getBuildingDisplayName, sortMachinesByCode } from "../utils/machinePresentation";
+import {
+  getBuildingDisplayName,
+  sortMachinesByCode,
+} from "../utils/machinePresentation";
 import styles from "./MachineList.module.css";
 
 export function MachineList() {
   const router = useRouter();
+  const [building, setBuilding] = useState<DormBuilding | null>(null);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [currentUserUid, setCurrentUserUid] = useState("");
   const [selectedScope, setSelectedScope] = useState<"all" | "mine">("all");
@@ -39,21 +44,28 @@ export function MachineList() {
       let shouldKeepLoading = false;
 
       try {
-        const profile = await getCurrentUserProfile();
-        if (!profile) {
-          shouldKeepLoading = true;
-          setIsLoading(true);
-          router.replace("/onboarding");
-          return;
+        let buildingToUse = building;
+        
+        if (!buildingToUse) {
+          const profile = await getCurrentUserProfile();
+          if (!profile) {
+            shouldKeepLoading = true;
+            setIsLoading(true);
+            router.replace("/onboarding");
+            return;
+          }
+          buildingToUse = profile.dormBuilding;
+          setBuilding(buildingToUse);
         }
 
         const { data } = await listMachinesByBuilding(
-          { dormBuilding: profile.dormBuilding },
+          { dormBuilding: buildingToUse },
           { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
         );
         setMachines(data.machines);
-        setBuildingName(getBuildingDisplayName(profile.dormBuilding));
-      } catch {
+        setBuildingName(getBuildingDisplayName(buildingToUse));
+      } catch (err) {
+        console.error("Error loading machines:", err);
         setError(
           "We couldn't load the machines. Check your connection and retry.",
         );
@@ -62,7 +74,7 @@ export function MachineList() {
         setIsRefreshing(false);
       }
     },
-    [router],
+    [building, router],
   );
 
   useEffect(() => {
@@ -94,7 +106,10 @@ export function MachineList() {
     (machine) => machine.type === selectedType,
   );
   const machineCodes = getMachineCodeMap(machines);
-  const orderedVisibleMachines = sortMachinesByCode(visibleMachines, machineCodes);
+  const orderedVisibleMachines = sortMachinesByCode(
+    visibleMachines,
+    machineCodes,
+  );
 
   if (isLoading) {
     return (
@@ -235,8 +250,7 @@ export function MachineList() {
             scopedMachines.length > 0 &&
             visibleMachines.length === 0 && (
               <p className={styles.emptyState}>
-                No{" "}
-                {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
+                No {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
                 {selectedScope === "mine"
                   ? "of this type are in use by you."
                   : "are listed for this building."}

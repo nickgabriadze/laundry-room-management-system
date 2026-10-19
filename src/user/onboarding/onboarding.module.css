@@ -31,31 +31,39 @@
   height: 30px;
   margin-bottom: 32px;
 }
-.eyebrowContainer{
-    display:flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    align-items: center;
-    justify-items: center;
+.eyebrowContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
 }
+
 .eyebrow {
   color: #147bb5;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
+  margin: 0;
 }
 
 .email {
-  color: #40484e;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 6px 12px;
+  background: #d5e2e9;
+  color: #126fa8;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 0;
 }
 
 .content h1 {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 650;
-  line-height: 1.15;
+  margin: 32px 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #324b5f;
+  text-align: center;
 }
 
 .description {
@@ -90,7 +98,6 @@
   align-items: start;
   gap: 12px;
   flex-wrap: wrap;
-  
 }
 
 .buildingChoice {
@@ -190,6 +197,91 @@
   padding: 0 18px;
 }
 
+.rulesSection {
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid #e0e8f0;
+}
+
+.rulesSection h2 {
+  margin: 0 0 16px 0;
+  color: #1683c4;
+  font-size: 16px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rulesSubtitle {
+  margin: -12px 0 16px 0;
+  color: #8b8b8b;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.rulesList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.rulesList li {
+  margin: 0;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f8fbfe;
+  color: #527084;
+  font-size: 14px;
+  line-height: 1.6;
+  border-left: 3px solid #1683c4;
+}
+
+.rulesList strong {
+  color: #1f4d66;
+  font-weight: 600;
+}
+
+.grayText {
+  color: #8b8b8b;
+}
+
+.formLabel {
+  color: #324b5f;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f8fbfe;
+  color: #527084;
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkboxLabel span {
+  margin-top: 2px;
+}
+
+.checkbox {
+  margin-top: 4px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #1683c4;
+}
+
 .message {
   display: grid;
   gap: 16px;
@@ -213,7 +305,8 @@
   }
 
   .content h1 {
-    font-size: 25px;
+    font-size: 14px;
+    margin: 24px 0 16px;
   }
 
   .buildingChoices {
