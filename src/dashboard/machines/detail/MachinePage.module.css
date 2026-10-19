@@ -279,6 +279,52 @@
   color: #b42318;
 }
 
+.previousUser {
+  padding: 16px;
+  margin: 24px 0 16px 0;
+  border: 1px solid #e5e0db;
+  border-left: 4px solid #d0c5ba;
+  border-radius: 6px;
+  background: #fcfbf9;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.previousUser h2 {
+  margin: 0 0 8px 0;
+  color: #7a7168;
+  font-size: 15px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.previousUser p {
+  margin: 6px 0 0;
+  color: #8b8278;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.previousUser a {
+  color: #1678aa;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #1678aa;
+}
+
+.previousUser a:hover {
+  color: #0c5d91;
+  border-bottom-color: #0c5d91;
+}
+
+.smallText {
+  font-size: 12px !important;
+  color: #a09890 !important;
+  margin-top: 8px !important;
+}
+
+
+
 @media (max-width: 520px) {
   .topbar {
     padding-inline: 20px;

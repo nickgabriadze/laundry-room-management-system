@@ -51,6 +51,20 @@ export interface GetMachineActiveSessionOwnerVariables {
   machineId: UUIDString;
 }
 
+export interface GetMachinePreviousSessionOwnerData {
+  laundryActivities: ({
+    user: {
+      email: string;
+    };
+    endsAt: TimestampString;
+    wasForceCancelled: boolean;
+  })[];
+}
+
+export interface GetMachinePreviousSessionOwnerVariables {
+  machineId: UUIDString;
+}
+
 export interface GetMyActiveMachineSessionData {
   laundryActivities: ({
     id: UUIDString;
@@ -199,6 +213,18 @@ export const getMachineActiveSessionOwnerRef: GetMachineActiveSessionOwnerRef;
 
 export function getMachineActiveSessionOwner(vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
 export function getMachineActiveSessionOwner(dc: DataConnect, vars: GetMachineActiveSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachineActiveSessionOwnerData, GetMachineActiveSessionOwnerVariables>;
+
+interface GetMachinePreviousSessionOwnerRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMachinePreviousSessionOwnerVariables): QueryRef<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMachinePreviousSessionOwnerVariables): QueryRef<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+  operationName: string;
+}
+export const getMachinePreviousSessionOwnerRef: GetMachinePreviousSessionOwnerRef;
+
+export function getMachinePreviousSessionOwner(vars: GetMachinePreviousSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+export function getMachinePreviousSessionOwner(dc: DataConnect, vars: GetMachinePreviousSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
 
 interface GetMyActiveMachineSessionRef {
   /* Allow users to create refs without passing in DataConnect */

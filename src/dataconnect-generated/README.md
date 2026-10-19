@@ -13,6 +13,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*ListMachines*](#listmachines)
   - [*ListMachinesByBuilding*](#listmachinesbybuilding)
   - [*GetMachineActiveSessionOwner*](#getmachineactivesessionowner)
+  - [*GetMachinePreviousSessionOwner*](#getmachineprevioussessionowner)
   - [*GetMyActiveMachineSession*](#getmyactivemachinesession)
   - [*GetMyUserAccount*](#getmyuseraccount)
   - [*GetSessionForReminderScheduling*](#getsessionforreminderscheduling)
@@ -383,6 +384,121 @@ const ref = getMachineActiveSessionOwnerRef({ machineId: ..., });
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = getMachineActiveSessionOwnerRef(dataConnect, getMachineActiveSessionOwnerVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
+});
+```
+
+## GetMachinePreviousSessionOwner
+You can execute the `GetMachinePreviousSessionOwner` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect-generated/index.d.ts](./index.d.ts):
+```typescript
+getMachinePreviousSessionOwner(vars: GetMachinePreviousSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+
+interface GetMachinePreviousSessionOwnerRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMachinePreviousSessionOwnerVariables): QueryRef<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+}
+export const getMachinePreviousSessionOwnerRef: GetMachinePreviousSessionOwnerRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMachinePreviousSessionOwner(dc: DataConnect, vars: GetMachinePreviousSessionOwnerVariables, options?: ExecuteQueryOptions): QueryPromise<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+
+interface GetMachinePreviousSessionOwnerRef {
+  ...
+  (dc: DataConnect, vars: GetMachinePreviousSessionOwnerVariables): QueryRef<GetMachinePreviousSessionOwnerData, GetMachinePreviousSessionOwnerVariables>;
+}
+export const getMachinePreviousSessionOwnerRef: GetMachinePreviousSessionOwnerRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMachinePreviousSessionOwnerRef:
+```typescript
+const name = getMachinePreviousSessionOwnerRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMachinePreviousSessionOwner` query requires an argument of type `GetMachinePreviousSessionOwnerVariables`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetMachinePreviousSessionOwnerVariables {
+  machineId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetMachinePreviousSessionOwner` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMachinePreviousSessionOwnerData`, which is defined in [dataconnect-generated/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMachinePreviousSessionOwnerData {
+  laundryActivities: ({
+    user: {
+      email: string;
+    };
+    endsAt: TimestampString;
+    wasForceCancelled: boolean;
+  })[];
+}
+```
+### Using `GetMachinePreviousSessionOwner`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMachinePreviousSessionOwner, GetMachinePreviousSessionOwnerVariables } from '@dataconnect/generated';
+
+// The `GetMachinePreviousSessionOwner` query requires an argument of type `GetMachinePreviousSessionOwnerVariables`:
+const getMachinePreviousSessionOwnerVars: GetMachinePreviousSessionOwnerVariables = {
+  machineId: ..., 
+};
+
+// Call the `getMachinePreviousSessionOwner()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMachinePreviousSessionOwner(getMachinePreviousSessionOwnerVars);
+// Variables can be defined inline as well.
+const { data } = await getMachinePreviousSessionOwner({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMachinePreviousSessionOwner(dataConnect, getMachinePreviousSessionOwnerVars);
+
+console.log(data.laundryActivities);
+
+// Or, you can use the `Promise` API.
+getMachinePreviousSessionOwner(getMachinePreviousSessionOwnerVars).then((response) => {
+  const data = response.data;
+  console.log(data.laundryActivities);
+});
+```
+
+### Using `GetMachinePreviousSessionOwner`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMachinePreviousSessionOwnerRef, GetMachinePreviousSessionOwnerVariables } from '@dataconnect/generated';
+
+// The `GetMachinePreviousSessionOwner` query requires an argument of type `GetMachinePreviousSessionOwnerVariables`:
+const getMachinePreviousSessionOwnerVars: GetMachinePreviousSessionOwnerVariables = {
+  machineId: ..., 
+};
+
+// Call the `getMachinePreviousSessionOwnerRef()` function to get a reference to the query.
+const ref = getMachinePreviousSessionOwnerRef(getMachinePreviousSessionOwnerVars);
+// Variables can be defined inline as well.
+const ref = getMachinePreviousSessionOwnerRef({ machineId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMachinePreviousSessionOwnerRef(dataConnect, getMachinePreviousSessionOwnerVars);
 
 // Call `executeQuery()` on the reference to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.

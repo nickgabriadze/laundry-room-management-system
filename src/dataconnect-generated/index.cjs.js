@@ -71,6 +71,21 @@ exports.getMachineActiveSessionOwner = function getMachineActiveSessionOwner(dcO
 }
 ;
 
+const getMachinePreviousSessionOwnerRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMachinePreviousSessionOwner', inputVars);
+}
+getMachinePreviousSessionOwnerRef.operationName = 'GetMachinePreviousSessionOwner';
+exports.getMachinePreviousSessionOwnerRef = getMachinePreviousSessionOwnerRef;
+
+exports.getMachinePreviousSessionOwner = function getMachinePreviousSessionOwner(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getMachinePreviousSessionOwnerRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
+}
+;
+
 const getMyActiveMachineSessionRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
