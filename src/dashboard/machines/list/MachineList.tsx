@@ -13,6 +13,7 @@ import {
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { ApplianceIcon } from "../components/ApplianceIcon";
 import { MachineCard, type Machine } from "../components/MachineCard";
+import { ContactPopover } from "../components/ContactPopover";
 import { getMachineCodeMap } from "../utils/machineCodes";
 import { getBuildingDisplayName, sortMachinesByCode } from "../utils/machinePresentation";
 import styles from "./MachineList.module.css";
@@ -124,6 +125,7 @@ export function MachineList() {
               </p>
             </div>
             <div className={styles.machineActions}>
+              <ContactPopover />
               <Link className={styles.refreshButton} href="/machine-labels">
                 Print QR stickers
               </Link>
