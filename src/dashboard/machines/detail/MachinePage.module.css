@@ -280,29 +280,45 @@
 }
 
 .previousUser {
-  padding: 16px;
-  margin: 24px 0 16px 0;
-  border: 1px solid #e5e0db;
-  border-left: 4px solid #d0c5ba;
-  border-radius: 6px;
-  background: #fcfbf9;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  margin: 28px 0 20px 0;
+  border: 1px solid #d5e2e9;
+  border-radius: 8px;
+  background: #f0f7fb;
+  box-shadow: 0 2px 8px rgba(22, 131, 196, 0.08);
 }
 
 .previousUser h2 {
   margin: 0 0 8px 0;
-  color: #7a7168;
-  font-size: 15px;
-  font-weight: 650;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  color: #1678aa;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  background: #c8dceb;
+  border-radius: 5px;
+  gap: 6px;
 }
 
 .previousUser p {
-  margin: 6px 0 0;
-  color: #8b8278;
+  margin: 8px 0 0;
+  color: #527084;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+.previousUser a {
+  color: #1678aa;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.previousUser a:hover {
+  color: #0c5d91;
 }
 
 .previousUser a {

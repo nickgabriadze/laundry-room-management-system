@@ -7,18 +7,24 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getFirebaseAuth } from "@/src/firebase";
 import {
+  DormBuilding,
   MachineType,
   listMachinesByBuilding,
 } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
 import { ApplianceIcon } from "../components/ApplianceIcon";
 import { MachineCard, type Machine } from "../components/MachineCard";
+import { ContactPopover } from "../components/ContactPopover";
 import { getMachineCodeMap } from "../utils/machineCodes";
-import { getBuildingDisplayName, sortMachinesByCode } from "../utils/machinePresentation";
+import {
+  getBuildingDisplayName,
+  sortMachinesByCode,
+} from "../utils/machinePresentation";
 import styles from "./MachineList.module.css";
 
 export function MachineList() {
   const router = useRouter();
+  const [building, setBuilding] = useState<DormBuilding | null>(null);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [currentUserUid, setCurrentUserUid] = useState("");
   const [selectedScope, setSelectedScope] = useState<"all" | "mine">("all");
@@ -38,21 +44,28 @@ export function MachineList() {
       let shouldKeepLoading = false;
 
       try {
-        const profile = await getCurrentUserProfile();
-        if (!profile) {
-          shouldKeepLoading = true;
-          setIsLoading(true);
-          router.replace("/onboarding");
-          return;
+        let buildingToUse = building;
+        
+        if (!buildingToUse) {
+          const profile = await getCurrentUserProfile();
+          if (!profile) {
+            shouldKeepLoading = true;
+            setIsLoading(true);
+            router.replace("/onboarding");
+            return;
+          }
+          buildingToUse = profile.dormBuilding;
+          setBuilding(buildingToUse);
         }
 
         const { data } = await listMachinesByBuilding(
-          { dormBuilding: profile.dormBuilding },
+          { dormBuilding: buildingToUse },
           { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
         );
         setMachines(data.machines);
-        setBuildingName(getBuildingDisplayName(profile.dormBuilding));
-      } catch {
+        setBuildingName(getBuildingDisplayName(buildingToUse));
+      } catch (err) {
+        console.error("Error loading machines:", err);
         setError(
           "We couldn't load the machines. Check your connection and retry.",
         );
@@ -61,7 +74,7 @@ export function MachineList() {
         setIsRefreshing(false);
       }
     },
-    [router],
+    [building, router],
   );
 
   useEffect(() => {
@@ -93,7 +106,10 @@ export function MachineList() {
     (machine) => machine.type === selectedType,
   );
   const machineCodes = getMachineCodeMap(machines);
-  const orderedVisibleMachines = sortMachinesByCode(visibleMachines, machineCodes);
+  const orderedVisibleMachines = sortMachinesByCode(
+    visibleMachines,
+    machineCodes,
+  );
 
   if (isLoading) {
     return (
@@ -115,15 +131,15 @@ export function MachineList() {
     <>
       <main className={styles.page}>
         <section className={styles.board} aria-labelledby="machines-title">
-          <header className={styles.heading}>
-            <div>
+          <header className={styles.header}>
+            <div className={styles.titleSection}>
               <p className={styles.eyebrow}>Laundry room</p>
               <h1 id="machines-title">{buildingName || "Your machines"}</h1>
               <p className={styles.subtitle}>
                 Choose an available machine to get started.
               </p>
             </div>
-            <div className={styles.machineActions}>
+            <div className={styles.actionBar}>
               <Link className={styles.refreshButton} href="/machine-labels">
                 Print QR stickers
               </Link>
@@ -138,11 +154,12 @@ export function MachineList() {
                 </span>
                 {isRefreshing ? "Refreshing" : "Refresh"}
               </button>
+              <ContactPopover />
             </div>
           </header>
 
           {machines.length > 0 && (
-            <>
+            <div className={styles.filterBar}>
               <div
                 className={styles.scopeSwitch}
                 role="group"
@@ -193,7 +210,7 @@ export function MachineList() {
                   Dryers <span className={styles.typeCount}>{dryerCount}</span>
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {isLoading && (
@@ -233,8 +250,7 @@ export function MachineList() {
             scopedMachines.length > 0 &&
             visibleMachines.length === 0 && (
               <p className={styles.emptyState}>
-                No{" "}
-                {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
+                No {selectedType === MachineType.WASHER ? "washers" : "dryers"}{" "}
                 {selectedScope === "mine"
                   ? "of this type are in use by you."
                   : "are listed for this building."}
