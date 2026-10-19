@@ -1,8 +1,8 @@
-# 🧺 Laundry Management System (LRMS)
+# Laundry Management System (LRMS)
 
 A modern, real-time laundry room management platform designed to help students efficiently manage shared laundry facilities in dormitories. Track machine availability, schedule sessions, and get reminders when your laundry is ready.
 
-## ✨ Features
+## Features
 
 ### Machine Management
 - **Real-time Availability** - See which washers and dryers are available or currently in use
@@ -32,7 +32,7 @@ A modern, real-time laundry room management platform designed to help students e
 - **Flexible Updates** - Change your building assignment as needed
 - **Personal History** - Track your laundry sessions
 
-## 🎯 How It Works
+## How It Works
 
 ### For Students
 
@@ -49,7 +49,7 @@ A modern, real-time laundry room management platform designed to help students e
 2. **Send Message** - Click their email to contact them
 3. **Remind Them** - Let them know about their forgotten items
 
-## 🏗️ Technology Overview
+## Technology Overview
 
 - **Frontend**: Next.js 16 with React 19 (TypeScript) - Modern web interface
 - **Backend**: Firebase (Authentication & Data Connect) - Secure cloud backend
@@ -58,7 +58,7 @@ A modern, real-time laundry room management platform designed to help students e
 - **Styling**: CSS Modules with Tailwind CSS - Responsive, fast loading
 - **Real-time**: Firebase Data Connect Queries - Instant updates
 
-## 📋 Machine Types
+## Machine Types
 
 ### Washers
 - Cycle duration: 10-120 minutes
@@ -70,20 +70,20 @@ A modern, real-time laundry room management platform designed to help students e
 - Higher capacity for larger loads
 - Available in all dormitory buildings
 
-## 🏢 Supported Buildings
+## Supported Buildings
 
 - **Building E** - Multiple washers and dryers
 - **Building F** - Multiple washers and dryers
 - **Building G** - Multiple washers and dryers
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
 - **Authentication Required** - Only registered users can access the system
 - **Limited Data Sharing** - Email addresses are only shown to other students already viewing the machine
 - **Secure Sessions** - Firebase-backed authentication ensures account safety
 - **Data Encryption** - All communications use HTTPS
 
-## 💡 Best Practices
+## Best Practices
 
 ### Scheduling Tips
 - **Check Display Times** - Set timer reminders on your phone for accurate cycle times
@@ -95,7 +95,7 @@ A modern, real-time laundry room management platform designed to help students e
 - **Report Issues** - Contact administrators if a machine is broken or malfunctioning
 - **Respect Schedule** - Honor the scheduled duration, don't extend sessions arbitrarily
 
-## 📞 Support & FAQ
+## Support & FAQ
 
 ### Common Issues
 
@@ -124,20 +124,20 @@ A modern, real-time laundry room management platform designed to help students e
 - You can run a washer and dryer simultaneously
 - Use the "In use by me" filter to track your sessions
 
-## 🚀 Getting Started as a User
+## Getting Started as a User
 
 1. Open the application in your web browser
 2. Sign in with your student credentials
 3. Complete your profile (select your building)
 4. Start managing your laundry!
 
-## 📱 Device Compatibility
+## Device Compatibility
 
 - **Desktop** - Full featured experience with detailed information
 - **Tablet** - Optimized responsive design for mid-sized screens
 - **Mobile** - Touch-friendly interface for on-the-go checking
 
-## 🎨 User Interface Highlights
+## User Interface Highlights
 
 - **Intuitive Dashboard** - See all machines at a glance with status indicators
 - **Clean Detail Pages** - Comprehensive information for each machine
@@ -145,7 +145,7 @@ A modern, real-time laundry room management platform designed to help students e
 - **Responsive Design** - Works seamlessly on all screen sizes
 - **Machine Codes** - Easy reference with # prefix (e.g., #WF1, #DE2)
 
-## 📊 Machine Data Display
+## Machine Data Display
 
 Each machine shows:
 - **Status** - Available or In Use
@@ -155,7 +155,7 @@ Each machine shows:
 - **Previous User** (if available) - For finding forgotten items
 - **Estimated Finish Time** (if in use) - When the machine will be free
 
-## 🔄 Session Lifecycle
+## Session Lifecycle
 
 1. **Schedule** - Choose available machine and set duration
 2. **Active** - Session running, reminder scheduled
@@ -163,16 +163,16 @@ Each machine shows:
 4. **Complete** - Machine automatically becomes available
 5. **History** - Session stored in your activity log
 
-## 🎯 Key Benefits
+## Key Benefits
 
-✅ **Save Time** - No need to physically check machines repeatedly  
-✅ **Never Forget** - Email reminders ensure you don't leave laundry unattended  
-✅ **Reduce Conflicts** - Clear occupancy information prevents double-bookings  
-✅ **Easy Communication** - Contact other students directly about forgotten items  
-✅ **Fair Access** - Everyone gets equal opportunities to use available machines  
-✅ **Convenient** - Access from anywhere on your phone or computer  
+- **Save Time** - No need to physically check machines repeatedly  
+- **Never Forget** - Email reminders ensure you don't leave laundry unattended  
+- **Reduce Conflicts** - Clear occupancy information prevents double-bookings  
+- **Easy Communication** - Contact other students directly about forgotten items  
+- **Fair Access** - Everyone gets equal opportunities to use available machines  
+- **Convenient** - Access from anywhere on your phone or computer
 
-## 📧 Email Reminders
+## Email Reminders
 
 ### When You'll Receive Emails
 
@@ -186,7 +186,7 @@ Each machine shows:
 - Check your spam/junk folder if you don't see emails
 - Verify your email address is correct in your profile
 
-## 🌟 Tips for Success
+## Tips for Success
 
 1. **Set Phone Timer** - Match your phone timer to the machine time for accuracy
 2. **Early Check** - Check the app 15 minutes before your machine should finish
@@ -199,5 +199,3 @@ Each machine shows:
 **Version**: 1.0  
 **Last Updated**: October 2026  
 **Built for Dormitory Students**
-
-For technical implementation details, see [FEATURE_SUMMARY.md](./FEATURE_SUMMARY.md)
