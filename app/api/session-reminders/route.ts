@@ -162,6 +162,10 @@ export async function POST(request: Request) {
         return jsonError("This reminder does not belong to your machine.", 403);
       }
 
+      console.log(
+        `[Resend] Attempting to cancel email ${reminderRequest.emailId}, current status: ${email.last_event}`,
+      );
+
       const getReminderStatus = (lastEvent: typeof email.last_event) =>
         lastEvent === "canceled"
           ? "cancelled"
@@ -171,14 +175,7 @@ export async function POST(request: Request) {
               ? "already-sent"
               : "not-scheduled";
 
-      if (email.last_event === "queued") {
-        return Response.json({
-          remindersCancelled: false,
-          reminderStatus: "queued",
-        });
-      }
-
-      if (email.last_event !== "scheduled") {
+      if (email.last_event !== "scheduled" && email.last_event !== "queued") {
         const reminderStatus = getReminderStatus(email.last_event);
         return Response.json({
           remindersCancelled: true,
@@ -188,6 +185,9 @@ export async function POST(request: Request) {
 
       const { error } = await resend.emails.cancel(reminderRequest.emailId);
       if (error) {
+        console.error(
+          `[Resend] Failed to cancel email ${reminderRequest.emailId}: ${error.message}`,
+        );
         const { data: latestEmail, error: latestEmailError } =
           await resend.emails.get(reminderRequest.emailId);
         if (
@@ -199,6 +199,9 @@ export async function POST(request: Request) {
           )
         ) {
           if (latestEmail.last_event === "queued") {
+            console.error(
+              `[Resend] Email still queued after cancel attempt: ${reminderRequest.emailId}`,
+            );
             return Response.json({
               remindersCancelled: false,
               reminderStatus: "queued",

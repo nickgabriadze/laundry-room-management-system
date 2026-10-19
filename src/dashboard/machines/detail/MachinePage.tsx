@@ -265,9 +265,9 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setActiveSessionEmail("");
       setMessage(
         cancellation.reminderStatus === "queued"
-          ? "The machine was stopped and is now available, but Resend had already queued the reminder email, so it may still be delivered."
+          ? "The machine was stopped and is now available. A reminder email may be on its way, check your inbox if you receive it."
           : cancellation.reminderStatus === "already-sent"
-            ? "The machine was stopped and is now available. The 10-minute reminder email had already been sent and can't be recalled."
+            ? "The machine was stopped and is now available. The 10-minute reminder email was already sent, you can ignore it."
             : cancellation.remindersCancelled
               ? "The machine was stopped and is now available."
               : "The machine was stopped and is now available, but we couldn't cancel the scheduled reminder email.",
