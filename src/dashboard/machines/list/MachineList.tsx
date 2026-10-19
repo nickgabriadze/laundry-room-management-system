@@ -116,16 +116,15 @@ export function MachineList() {
     <>
       <main className={styles.page}>
         <section className={styles.board} aria-labelledby="machines-title">
-          <header className={styles.heading}>
-            <div>
+          <header className={styles.header}>
+            <div className={styles.titleSection}>
               <p className={styles.eyebrow}>Laundry room</p>
               <h1 id="machines-title">{buildingName || "Your machines"}</h1>
               <p className={styles.subtitle}>
                 Choose an available machine to get started.
               </p>
             </div>
-            <div className={styles.machineActions}>
-              <ContactPopover />
+            <div className={styles.actionBar}>
               <Link className={styles.refreshButton} href="/machine-labels">
                 Print QR stickers
               </Link>
@@ -140,11 +139,12 @@ export function MachineList() {
                 </span>
                 {isRefreshing ? "Refreshing" : "Refresh"}
               </button>
+              <ContactPopover />
             </div>
           </header>
 
           {machines.length > 0 && (
-            <>
+            <div className={styles.filterBar}>
               <div
                 className={styles.scopeSwitch}
                 role="group"
@@ -195,7 +195,7 @@ export function MachineList() {
                   Dryers <span className={styles.typeCount}>{dryerCount}</span>
                 </button>
               </div>
-            </>
+            </div>
           )}
 
           {isLoading && (
