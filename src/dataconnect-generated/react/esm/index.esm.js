@@ -1,4 +1,4 @@
-import { listMachinesRef, listMachinesByBuildingRef, getMachineActiveSessionOwnerRef, getMyActiveMachineSessionRef, getMyUserAccountRef, createMyUserAccountRef, updateMyBuildingRef, occupyMachineRef, forceCancelMyMachineSessionRef, getSessionForReminderSchedulingRef, saveSessionReminderEmailIdRef, connectorConfig } from '../../esm/index.esm.js';
+import { listMachinesRef, listMachinesByBuildingRef, getMachineActiveSessionOwnerRef, getMachinePreviousSessionOwnerRef, getMyActiveMachineSessionRef, getMyUserAccountRef, createMyUserAccountRef, updateMyBuildingRef, occupyMachineRef, forceCancelMyMachineSessionRef, getSessionForReminderSchedulingRef, saveSessionReminderEmailIdRef, connectorConfig } from '../../esm/index.esm.js';
 import { validateArgs, CallerSdkTypeEnum } from 'firebase/data-connect';
 import { useDataConnectQuery, useDataConnectMutation, validateReactArgs } from '@tanstack-query-firebase/react/data-connect';
 
@@ -18,6 +18,12 @@ export function useListMachinesByBuilding(dcOrVars, varsOrOptions, options) {
 export function useGetMachineActiveSessionOwner(dcOrVars, varsOrOptions, options) {
   const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
   const ref = getMachineActiveSessionOwnerRef(dcInstance, inputVars);
+  return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
+}
+
+export function useGetMachinePreviousSessionOwner(dcOrVars, varsOrOptions, options) {
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateReactArgs(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  const ref = getMachinePreviousSessionOwnerRef(dcInstance, inputVars);
   return useDataConnectQuery(ref, inputOpts, CallerSdkTypeEnum.GeneratedReact);
 }
 

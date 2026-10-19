@@ -23,7 +23,7 @@ export function MachineCard({
     >
       <Link className={styles.cardLink} href={`/machine/${machineCode}`}>
         <div className={styles.cardTopline}>
-          <span className={styles.machineId}>{machineCode}</span>
+          <span className={styles.machineId}>#{machineCode}</span>
           <span className={styles.status}>
             <i aria-hidden="true" />
             {isInUse ? "In use" : "Available"}

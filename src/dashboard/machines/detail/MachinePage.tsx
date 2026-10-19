@@ -10,6 +10,7 @@ import {
   getMachineActiveSessionOwner,
   getMyActiveMachineSession,
   listMachinesByBuilding,
+  getMachinePreviousSessionOwner,
 } from "@/src/dataconnect-generated";
 import type { GetMyActiveMachineSessionData } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
@@ -22,6 +23,7 @@ import {
   startMachineSession,
 } from "../data/sessions";
 import { ActiveMachineSession } from "./ActiveMachineSession";
+import { PreviousMachineUser } from "./PreviousMachineUser";
 import styles from "./MachinePage.module.css";
 import { MachineSessionForm } from "./MachineSessionForm";
 import { getMachineCodeMap } from "../utils/machineCodes";
@@ -42,6 +44,8 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
     null,
   );
   const [activeSessionEmail, setActiveSessionEmail] = useState("");
+  const [previousSessionEmail, setPreviousSessionEmail] = useState("");
+  const [previousSessionEndTime, setPreviousSessionEndTime] = useState<string>("");
   const [hasOtherMachineOfTypeInUse, setHasOtherMachineOfTypeInUse] =
     useState(false);
   const [pageState, setPageState] = useState<PageState>("loading");
@@ -55,6 +59,8 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       setMachine(null);
       setMyActiveSession(null);
       setActiveSessionEmail("");
+      setPreviousSessionEmail("");
+      setPreviousSessionEndTime("");
       setHasOtherMachineOfTypeInUse(false);
 
       try {
@@ -111,10 +117,22 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
             : null;
         if (!isActive()) return;
 
+        const previousOwnerResponse = await getMachinePreviousSessionOwner(
+          { machineId: foundMachine.id },
+          { fetchPolicy: QueryFetchPolicy.SERVER_ONLY },
+        );
+        if (!isActive()) return;
+
         setMachine(foundMachine);
         setMyActiveSession(sessionResponse.data.laundryActivities[0] ?? null);
         setActiveSessionEmail(
           ownerResponse?.data.laundryActivities[0]?.user.email ?? "",
+        );
+        setPreviousSessionEmail(
+          previousOwnerResponse?.data.laundryActivities[0]?.user.email ?? "",
+        );
+        setPreviousSessionEndTime(
+          previousOwnerResponse?.data.laundryActivities[0]?.endsAt ?? "",
         );
         setPageState("ready");
       } catch {
@@ -312,10 +330,18 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
         {machine && pageState !== "loading" && pageState !== "error" && (
           <>
             <p className={styles.eyebrow}>Laundry room</p>
-            <p className={styles.machineCode}>{machineCode}</p>
+            <p className={styles.machineCode}>#{machineCode}</p>
             <h1 id="machine-title">
               {machine.type === "WASHER" ? "Washer" : "Dryer"}
             </h1>
+
+            {!isOccupied && previousSessionEmail && (
+              <PreviousMachineUser
+                previousSessionEmail={previousSessionEmail}
+                previousSessionEndTime={previousSessionEndTime}
+              />
+            )}
+
             <div
               className={`${styles.applianceArea} ${isOccupied ? styles.applianceAreaOccupied : ""}`}
             >
