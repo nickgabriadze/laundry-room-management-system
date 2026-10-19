@@ -58,30 +58,27 @@ export function useOnboarding() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!building || !guidelinesAccepted || !getFirebaseAuth().currentUser) return;
+    if (!building || !guidelinesAccepted || !getFirebaseAuth().currentUser)
+      return;
 
     setPageState("saving");
     setError("");
 
     try {
-      await createCurrentUserProfile(building);
-      router.replace(getPostOnboardingRoute(window.location.search));
-    } catch {
-      try {
-        const account = await getCurrentUserProfile();
-        if (account) {
-          router.replace(getPostOnboardingRoute(window.location.search));
-          return;
-        }
-      } catch {
-        setError("We couldn't verify your profile. Please try again.");
-        setPageState("ready");
+      const result = await createCurrentUserProfile(building);
+      const { data } = result;
+      if (data?.userAccount_insert) {
+        router.replace(getPostOnboardingRoute(window.location.search));
         return;
       }
-
-      setError("We couldn't save your profile. Please try again.");
+    } catch {
+      setError("We couldn't verify your profile. Please try again.");
       setPageState("ready");
+      return;
     }
+
+    setError("We couldn't save your profile. Please try again.");
+    setPageState("ready");
   }
 
   return {

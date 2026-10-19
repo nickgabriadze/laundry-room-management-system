@@ -4,12 +4,15 @@ import {
   updateMyBuilding,
   type DormBuilding,
 } from "@/src/dataconnect-generated";
+import { QueryFetchPolicy } from "firebase/data-connect";
 
 export const BUILDING_CHANGE_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
 export async function getCurrentUserProfile() {
-  const { data } = await getMyUserAccount();
-  return data.userAccount ?? null;
+  const result = await getMyUserAccount({
+    fetchPolicy: QueryFetchPolicy.SERVER_ONLY,
+  });
+  return result.data.userAccount ?? null;
 }
 
 export async function createCurrentUserProfile(dormBuilding: DormBuilding) {
