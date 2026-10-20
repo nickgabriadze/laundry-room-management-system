@@ -14,7 +14,6 @@ import {
 } from "@/src/dataconnect-generated";
 import type { GetMyActiveMachineSessionData } from "@/src/dataconnect-generated";
 import { getCurrentUserProfile } from "@/src/user/profile";
-import { ApplianceIcon } from "../components/ApplianceIcon";
 import type { Machine } from "../components/MachineCard";
 import {
   forceCancelMyMachineSessionById,
@@ -22,11 +21,12 @@ import {
   MAX_WASHER_SESSION_MINUTES,
   startMachineSession,
 } from "../data/sessions";
-import { ActiveMachineSession } from "./ActiveMachineSession";
-import { PreviousMachineUser } from "./PreviousMachineUser";
 import styles from "./MachinePage.module.css";
-import { MachineSessionForm } from "./MachineSessionForm";
 import { getMachineCodeMap } from "../utils/machineCodes";
+import { MachinePageLoading } from "./components/MachinePageLoading";
+import { MachinePageError } from "./components/MachinePageError";
+import { MachinePageNotFound } from "./components/MachinePageNotFound";
+import { MachinePageContent } from "./components/MachinePageContent";
 
 type PageState =
   | "loading"
@@ -37,8 +37,18 @@ type PageState =
   | "not-found";
 type ActiveSession = GetMyActiveMachineSessionData["laundryActivities"][number];
 
-export function MachinePage({ machineCode }: { machineCode: string }) {
+export function MachinePage({
+  machineCode,
+  readOnly = false,
+  qrToken,
+}: {
+  machineCode: string;
+  readOnly?: boolean;
+  qrToken?: string;
+}) {
   const router = useRouter();
+  // If no qrToken provided, automatically set readOnly mode
+  const isReadOnly = !qrToken || readOnly;
   const [machine, setMachine] = useState<Machine | null>(null);
   const [myActiveSession, setMyActiveSession] = useState<ActiveSession | null>(
     null,
@@ -51,6 +61,7 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [message, setMessage] = useState("");
   const [isMessageError, setIsMessageError] = useState(false);
+  const [tokenValid, setTokenValid] = useState(!!qrToken);
 
   const loadMachine = useCallback(
     async (isActive: () => boolean) => {
@@ -154,7 +165,28 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
         );
         return;
       }
-      void loadMachine(() => active);
+
+      if (qrToken) {
+        import("@/src/lib/jwt-utils").then(({ validateToken }) => {
+          const isValid = validateToken(qrToken, machineCode);
+          if (!isValid) {
+            if (active) {
+              setTokenValid(false);
+              setMessage("Either machine was not found or you should scan the QR code once again.");
+              setIsMessageError(true);
+            }
+            // Still load machine data even with invalid token, so we can show the error message
+            void loadMachine(() => active);
+            return;
+          }
+          if (active) {
+            setTokenValid(true);
+            void loadMachine(() => active);
+          }
+        });
+      } else {
+        void loadMachine(() => active);
+      }
     });
 
     return () => {
@@ -301,89 +333,44 @@ export function MachinePage({ machineCode }: { machineCode: string }) {
       </header>
 
       <section className={styles.panel} aria-labelledby="machine-title">
-        {pageState === "loading" && (
-          <p className={styles.message} role="status">
-            Loading machine...
-          </p>
-        )}
+        {pageState === "loading" && <MachinePageLoading />}
 
         {pageState === "error" && (
-          <div className={styles.message} role="alert">
-            <p>{message}</p>
-            <button
-              className={styles.secondaryButton}
-              onClick={() => void loadMachine(() => true)}
-              type="button"
-            >
-              Try again
-            </button>
-          </div>
+          <MachinePageError
+            message={message}
+            onRetry={() => void loadMachine(() => true)}
+          />
         )}
 
-        {pageState === "not-found" && (
-          <div className={styles.message} role="alert">
-            <h1 id="machine-title">Machine not found</h1>
-            <p>This machine is not listed for your dorm building.</p>
-          </div>
-        )}
+        {pageState === "not-found" && <MachinePageNotFound />}
 
         {machine && pageState !== "loading" && pageState !== "error" && (
-          <>
-            <p className={styles.eyebrow}>Laundry room</p>
-            <p className={styles.machineCode}>#{machineCode}</p>
-            <h1 id="machine-title">
-              {machine.type === "WASHER" ? "Washer" : "Dryer"}
-            </h1>
-
-            {!isOccupied && previousSessionEmail && (
-              <PreviousMachineUser
-                previousSessionEmail={previousSessionEmail}
-                previousSessionEndTime={previousSessionEndTime}
-              />
-            )}
-
-            <div
-              className={`${styles.applianceArea} ${isOccupied ? styles.applianceAreaOccupied : ""}`}
-            >
-              <ApplianceIcon type={machine.type} isInUse={isOccupied} />
-            </div>
-
-            {isOccupied && activeSession ? (
-              <ActiveMachineSession
-                activeSession={activeSession}
-                activeSessionEmail={activeSessionEmail}
-                busy={isBusy}
-                hasOtherMachineOfTypeInUse={hasOtherMachineOfTypeInUse}
-                machine={machine}
-                myActiveSession={myActiveSession}
-                onBeginCancel={() => {
-                  setMessage("");
-                  setIsMessageError(false);
-                }}
-                onForceCancel={handleForceCancel}
-              />
-            ) : (
-              <MachineSessionForm
-                busy={isBusy}
-                hasOtherMachineOfTypeInUse={hasOtherMachineOfTypeInUse}
-                machine={machine}
-                onInputChange={() => {
-                  setMessage("");
-                  setIsMessageError(false);
-                }}
-                onStart={handleStartSession}
-              />
-            )}
-
-            {message && (
-              <p
-                className={isMessageError ? styles.error : styles.success}
-                role={isMessageError ? "alert" : "status"}
-              >
-                {message}
-              </p>
-            )}
-          </>
+          <MachinePageContent
+            machineCode={machineCode}
+            machine={machine}
+            isOccupied={isOccupied}
+            activeSession={activeSession}
+            activeSessionEmail={activeSessionEmail}
+            previousSessionEmail={previousSessionEmail}
+            previousSessionEndTime={previousSessionEndTime}
+            myActiveSession={myActiveSession}
+            hasOtherMachineOfTypeInUse={hasOtherMachineOfTypeInUse}
+            isBusy={isBusy}
+            isReadOnly={isReadOnly}
+            tokenValid={tokenValid}
+            message={message}
+            isMessageError={isMessageError}
+            onBeginCancel={() => {
+              setMessage("");
+              setIsMessageError(false);
+            }}
+            onForceCancel={handleForceCancel}
+            onInputChange={() => {
+              setMessage("");
+              setIsMessageError(false);
+            }}
+            onStart={handleStartSession}
+          />
         )}
       </section>
     </main>

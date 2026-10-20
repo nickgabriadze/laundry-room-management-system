@@ -101,22 +101,6 @@ export function MachineLabelsPage() {
         {pageState === "ready" && labels.length === 0 && (
           <p className={styles.status}>No machines are listed for your building.</p>
         )}
-        {labels.length > 0 && (
-          <div className={styles.labelGrid}>
-            {labels.map((label) => (
-              <article className={styles.label} key={label.code}>
-                <img
-                  alt={`QR code for machine ${label.code}`}
-                  className={styles.qrCode}
-                  src={label.image}
-                />
-                <h2>{label.code}</h2>
-                <p>{label.description}</p>
-                <span className={styles.url}>{label.url}</span>
-              </article>
-            ))}
-          </div>
-        )}
       </section>
     </main>
   );

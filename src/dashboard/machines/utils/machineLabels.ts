@@ -4,7 +4,6 @@ import { getMachineCodeMap } from "./machineCodes";
 
 export type MachineLabel = {
   code: string;
-  description: string;
   url: string;
   image: string;
 };
@@ -24,7 +23,7 @@ export async function createMachineLabels(
       }
 
       const url = new URL(
-        `/machine/${encodeURIComponent(code)}`,
+        `/api/qr-token?machineCode=${encodeURIComponent(code)}`,
         origin,
       ).toString();
       const image = await QRCode.toDataURL(url, {
@@ -35,7 +34,6 @@ export async function createMachineLabels(
 
       return {
         code,
-        description: `${machine.type === "WASHER" ? "Washer" : "Dryer"} · Building ${machine.dormBuilding.slice(-1)}`,
         url,
         image,
       };
